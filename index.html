@@ -2,74 +2,463 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>FOM - Focus On Mission</title>
+
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { min-height: 100vh; background: radial-gradient(circle at top, #1d2bff 0%, #09091f 40%, #03030a 100%); color: white; padding: 18px; overflow-x:hidden; }
-    .app { max-width: 430px; margin: 0 auto; padding-bottom: 30px; }
-    .header { text-align: center; margin-top: 12px; margin-bottom: 24px; }
-    .logo { font-size: 42px; font-weight: bold; }
-    .subtitle { color: #b8c7ff; font-size: 14px; margin-top: 4px; }
-    .card { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.13); border-radius: 24px; padding: 18px; margin-bottom: 16px; box-shadow: 0 15px 40px rgba(0,0,0,.35); backdrop-filter: blur(12px); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg1: #1d2bff;
+      --bg2: #09091f;
+      --bg3: #03030a;
+      --card: rgba(255,255,255,.09);
+      --card2: rgba(0,0,0,.24);
+      --line: rgba(255,255,255,.14);
+      --text2: #b8c7ff;
+      --blue: #00e5ff;
+      --purple: #8b5cf6;
+      --pink: #ff4ecd;
+      --red: #ef4444;
+      --orange: #f59e0b;
+      --green: #22c55e;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, var(--bg1) 0%, var(--bg2) 42%, var(--bg3) 100%);
+      color: white;
+      padding: 14px;
+      overflow-x: hidden;
+    }
+
+    .app { max-width: 430px; margin: 0 auto; padding-bottom: 42px; }
+
+    .sound-float {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.13);
+      border: 1px solid rgba(255,255,255,.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      font-size: 21px;
+    }
+
+    .header {
+      text-align: center;
+      margin-top: 18px;
+      margin-bottom: 16px;
+      padding-top: 4px;
+    }
+
+    .logo {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: .5px;
+    }
+
+    .subtitle {
+      color: var(--text2);
+      font-size: 14px;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 17px;
+      margin-bottom: 14px;
+      box-shadow: 0 15px 40px rgba(0,0,0,.35);
+      backdrop-filter: blur(12px);
+    }
+
+    .compact-card { padding: 14px 16px; }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .section-title {
+      font-size: 19px;
+      font-weight: 900;
+    }
+
+    .chevron { color: var(--text2); font-size: 18px; transition: .25s; }
+    .collapsed .chevron { transform: rotate(-90deg); }
+    .section-body { margin-top: 14px; }
+    .collapsed .section-body { display: none; }
+
+    .notice {
+      background: linear-gradient(135deg, #6d28d9, #2563eb);
+      border-radius: 22px;
+      padding: 15px;
+      margin-bottom: 12px;
+      font-weight: 800;
+      line-height: 1.38;
+      box-shadow: 0 12px 30px rgba(0,0,0,.25);
+    }
+
     .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .metric h2 { font-size: 34px; margin-top: 6px; }
-    .metric p { color: #b8c7ff; font-size: 13px; }
-    .progress-bar { width: 100%; height: 14px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-top: 12px; }
-    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#00e5ff,#8b5cf6,#ff4ecd); border-radius: 99px; transition: .4s; }
-    .notice { background: linear-gradient(135deg,#6d28d9,#2563eb); border-radius: 22px; padding: 16px; margin-bottom: 16px; font-weight: bold; line-height: 1.4; }
-    .timeline { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; position: relative; }
-    .timeline::before { content: ""; position: absolute; top: 21px; left: 20px; right: 20px; height: 4px; background: rgba(255,255,255,.18); z-index: 0; border-radius: 10px; }
-    .day { position: relative; z-index: 1; text-align: center; font-size: 11px; color: #cbd5ff; }
-    .circle { width: 42px; height: 42px; border-radius: 50%; background: #111827; border: 2px solid #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; margin-bottom: 5px; }
-    .circle.done { background: linear-gradient(135deg,#00e5ff,#8b5cf6); border-color: white; color: white; }
-    .section-title { font-size: 19px; margin-bottom: 14px; }
-    .task { background: rgba(0,0,0,.24); border-radius: 18px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 10px; align-items: center; transition:.25s; }
-    .task.done { border: 1px solid #00e5ff; background: rgba(0,229,255,.12); }
-    .task.flash { transform: scale(1.02); box-shadow: 0 0 28px rgba(0,229,255,.6); }
-    .task small { color: #aab6ff; display: block; margin-bottom: 4px; }
-    .task-actions { display: flex; gap: 5px; align-items: center; flex-wrap:wrap; justify-content:flex-end; }
-    .icon-btn { min-width: 42px; padding: 11px; }
+
+    .metric p {
+      color: var(--text2);
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .metric h2 {
+      font-size: 32px;
+      line-height: 1.1;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 16px;
+      background: rgba(255,255,255,.14);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--blue), var(--purple), var(--pink));
+      border-radius: 99px;
+      transition: .5s ease;
+      box-shadow: 0 0 18px rgba(0,229,255,.55);
+    }
+
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 21px;
+      left: 20px;
+      right: 20px;
+      height: 4px;
+      background: rgba(255,255,255,.18);
+      z-index: 0;
+      border-radius: 10px;
+    }
+
+    .day {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      font-size: 11px;
+      color: #cbd5ff;
+      width: 44px;
+    }
+
+    .circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #111827;
+      border: 2px solid #4f46e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .circle.done {
+      background: linear-gradient(135deg, var(--blue), var(--purple));
+      border-color: white;
+      color: white;
+    }
+
+    .task {
+      background: rgba(0,0,0,.22);
+      border-radius: 18px;
+      padding: 13px;
+      margin-bottom: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,.08);
+      position: relative;
+    }
+
+    .task.done {
+      border: 1px solid var(--blue);
+      background: rgba(0,229,255,.12);
+    }
+
+    .task.late {
+      border-color: rgba(245,158,11,.95);
+      box-shadow: 0 0 0 1px rgba(245,158,11,.15);
+    }
+
+    .task.next {
+      border-color: rgba(34,197,94,.9);
+      box-shadow: 0 0 0 1px rgba(34,197,94,.18);
+    }
+
+    .task small {
+      color: #aab6ff;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .task strong {
+      font-size: 17px;
+      line-height: 1.22;
+    }
+
+    .task-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: stretch;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: white;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(135deg,#2563eb,#8b5cf6);
+      font-size: 14px;
+    }
+
+    .icon-btn {
+      min-width: 42px;
+      padding: 10px;
+      line-height: 1;
+    }
+
     .edit { background: linear-gradient(135deg,#f59e0b,#ec4899); }
-    .delete { background: #ef4444; }
-    button { border: none; border-radius: 14px; padding: 11px 13px; color: white; font-weight: bold; cursor: pointer; background: linear-gradient(135deg,#2563eb,#8b5cf6); }
-    input, textarea { width: 100%; padding: 13px; margin-bottom: 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.28); color: white; outline: none; }
-    textarea { min-height: 90px; resize: vertical; font-size: 12px; }
-    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .days-picker { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
-    .days-picker label { background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 10px 6px; font-size: 13px; text-align: center; }
-    .days-picker input { width: auto; margin-right: 4px; margin-bottom: 0; }
-    .add-btn { width: 100%; margin-top: 4px; background: linear-gradient(135deg,#00e5ff,#8b5cf6); }
-    .cancel-btn { width: 100%; margin-top: 8px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); }
-    .empty { color: #aab6ff; font-size: 14px; text-align: center; padding: 12px; }
-    .summary-item, .history-item { background: rgba(0,0,0,.22); border-radius: 16px; padding: 12px; margin-bottom: 8px; }
-    .summary-item small, .history-item small { color: #aab6ff; display: block; margin-bottom: 3px; }
-    .footer { text-align: center; color: #7f8cff; font-size: 12px; margin-top: 20px; }
-    .settings-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .toggle { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.18); }
-    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(120px); width: min(390px, calc(100% - 28px)); background: linear-gradient(135deg,#111827,#312e81); border:1px solid rgba(255,255,255,.18); border-radius:22px; padding:16px; box-shadow:0 18px 50px rgba(0,0,0,.55); z-index:20; opacity:0; transition:.35s; }
-    .toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
-    .toast strong { display:block; font-size:18px; margin-bottom:4px; }
-    .celebration { position:fixed; inset:0; pointer-events:none; z-index:15; overflow:hidden; }
-    .confetti { position:absolute; width:10px; height:14px; border-radius:3px; animation: fall 1.4s linear forwards; }
-    @keyframes fall { from { transform: translateY(-20px) rotate(0deg); opacity:1; } to { transform: translateY(105vh) rotate(720deg); opacity:0; } }
-    .pulse-screen { position:fixed; inset:0; background: radial-gradient(circle, rgba(0,229,255,.25), rgba(139,92,246,.12), transparent 60%); pointer-events:none; opacity:0; z-index:14; animation:pulse .9s ease-out forwards; }
-    @keyframes pulse { 0%{opacity:0; transform:scale(.85)} 35%{opacity:1} 100%{opacity:0; transform:scale(1.15)} }
-    .weekly-modal { position:fixed; inset:0; background:rgba(0,0,0,.72); display:none; align-items:center; justify-content:center; padding:20px; z-index:30; }
-    .weekly-box { max-width:390px; width:100%; text-align:center; background:linear-gradient(135deg,#111827,#1e1b4b,#312e81); border:1px solid rgba(255,255,255,.18); border-radius:28px; padding:26px; box-shadow:0 25px 70px rgba(0,0,0,.6); }
-    .weekly-box h2 { font-size:30px; margin-bottom:10px; }
-    .weekly-box p { color:#dbe4ff; line-height:1.45; margin-bottom:18px; }
+    .delete { background: var(--red); }
+    .done-btn { background: linear-gradient(135deg,#2563eb,#8b5cf6); }
+    .done-btn.done { background: linear-gradient(135deg,#16a34a,#22c55e); }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.28);
+      color: white;
+      outline: none;
+      font-size: 16px;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+      font-size: 12px;
+    }
+
+    input[type="time"] {
+      min-height: 52px;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .days-picker {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .days-picker label {
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 14px;
+      padding: 10px 6px;
+      font-size: 13px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .days-picker input {
+      width: auto;
+      margin: 0;
+      accent-color: var(--blue);
+    }
+
+    .add-btn {
+      width: 100%;
+      margin-top: 4px;
+      background: linear-gradient(135deg,var(--blue),var(--purple));
+    }
+
+    .cancel-btn {
+      width: 100%;
+      margin-top: 8px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .empty {
+      color: #aab6ff;
+      font-size: 14px;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .summary-item, .history-item {
+      background: rgba(0,0,0,.22);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .summary-item small, .history-item small {
+      color: #aab6ff;
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .quick-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .quick-row button {
+      flex: 1;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.16);
+      color: #fff;
+    }
+
+    #toast {
+      position: fixed;
+      bottom: 26px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: linear-gradient(135deg,var(--blue),var(--purple));
+      color: white;
+      padding: 14px 20px;
+      border-radius: 18px;
+      font-weight: 900;
+      transition: .35s ease;
+      z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0,0,0,.45);
+      width: calc(100% - 44px);
+      max-width: 390px;
+      text-align: center;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.70);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      padding: 22px;
+    }
+
+    .overlay.show { display: flex; }
+
+    .modal {
+      width: 100%;
+      max-width: 390px;
+      background: radial-gradient(circle at top, rgba(29,43,255,.92), rgba(9,9,31,.98));
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 28px;
+      padding: 26px;
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(0,0,0,.55);
+    }
+
+    .modal .big {
+      font-size: 56px;
+      margin-bottom: 8px;
+    }
+
+    .modal h2 {
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    .modal p {
+      color: #d9e2ff;
+      line-height: 1.42;
+      margin-bottom: 18px;
+    }
+
+    .mini-note {
+      font-size: 12px;
+      color: var(--text2);
+      margin-top: -4px;
+      margin-bottom: 10px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #7f8cff;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 370px) {
+      body { padding: 10px; }
+      .logo { font-size: 36px; }
+      .card { border-radius: 20px; padding: 14px; }
+      .days-picker { grid-template-columns: repeat(3, 1fr); }
+      .task { grid-template-columns: 1fr; }
+      .task-actions { flex-direction: row; }
+    }
   </style>
 </head>
+
 <body>
-  <div class="celebration" id="celebration"></div>
-  <div id="pulseRoot"></div>
-  <div class="toast" id="toast"><strong id="toastTitle"></strong><span id="toastText"></span></div>
-  <div class="weekly-modal" id="weeklyModal">
-    <div class="weekly-box">
-      <h2>🏆 Semana perfeita!</h2>
-      <p>Persistência vence intensidade. Você construiu essa semana missão por missão.</p>
-      <button onclick="closeWeeklyModal()">Continuar missão</button>
+  <div class="sound-float" id="soundToggle" onclick="toggleSound()" title="Som e efeitos">🔇</div>
+  <div id="toast"></div>
+
+  <div class="overlay" id="achievementOverlay">
+    <div class="modal">
+      <div class="big" id="achievementIcon">🏆</div>
+      <h2 id="achievementTitle">Conquista!</h2>
+      <p id="achievementText">Você avançou no modo missão.</p>
+      <button onclick="closeAchievement()">Continuar</button>
     </div>
   </div>
 
@@ -80,6 +469,12 @@
       <div class="subtitle">Sua disciplina em modo missão</div>
     </div>
 
+    <div class="card compact-card">
+      <div class="section-title">Barra do dia</div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <p class="subtitle" id="todayCount" style="margin-top:10px;">0 de 0 missões concluídas</p>
+    </div>
+
     <div class="notice" id="notice">Sua ofensiva depende da próxima missão. Não quebra a sequência.</div>
 
     <div class="top-grid">
@@ -88,83 +483,107 @@
     </div>
 
     <div class="card">
-      <div class="settings-row">
-        <div>
-          <h3 class="section-title" style="margin-bottom:4px;">Som e efeitos</h3>
-          <p class="subtitle">Toque em concluir para liberar áudio no celular.</p>
-        </div>
-        <button class="toggle" id="soundBtn" onclick="toggleSound()">🔊 ON</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <h3 class="section-title">Barra do dia</h3>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-      <p class="subtitle" id="todayCount" style="margin-top:10px;">0 de 0 missões concluídas</p>
-    </div>
-
-    <div class="card">
-      <h3 class="section-title">Timeline da semana</h3>
+      <div class="section-title">Timeline da semana</div>
       <div class="timeline" id="timeline"></div>
     </div>
 
-    <div class="card">
-      <h3 class="section-title">Agenda de hoje</h3>
-      <div id="tasksList"></div>
-    </div>
-
-    <div class="card">
-      <h3 class="section-title" id="formTitle">Adicionar missão</h3>
-      <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
-      <div class="days-picker">
-        <label><input type="checkbox" value="1">Seg</label><label><input type="checkbox" value="2">Ter</label>
-        <label><input type="checkbox" value="3">Qua</label><label><input type="checkbox" value="4">Qui</label>
-        <label><input type="checkbox" value="5">Sex</label><label><input type="checkbox" value="6">Sáb</label>
-        <label><input type="checkbox" value="0">Dom</label>
+    <div class="card" id="agendaCard">
+      <div class="section-header" onclick="toggleCollapse('agendaCard')">
+        <h3 class="section-title">Agenda de hoje</h3>
+        <span class="chevron">⌄</span>
       </div>
-      <div class="time-grid">
-        <div><p class="subtitle">Início</p><input type="time" id="taskStart" value="08:00" /></div>
-        <div><p class="subtitle">Fim</p><input type="time" id="taskEnd" value="08:30" /></div>
+      <div class="section-body">
+        <div class="quick-row">
+          <button onclick="scrollToNextMission()">Próxima missão</button>
+          <button onclick="toggleCompactAgenda()">Compactar</button>
+        </div>
+        <div id="tasksList"></div>
       </div>
-      <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
-      <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
-      <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
     </div>
 
-    <div class="card">
-      <h3 class="section-title">Próximo dia</h3>
-      <p class="subtitle" id="tomorrowLabel" style="margin-bottom:10px;"></p>
-      <div id="tomorrowList"></div>
+    <div class="card collapsed" id="formCard">
+      <div class="section-header" onclick="toggleCollapse('formCard')">
+        <h3 class="section-title" id="formTitle">Adicionar missão</h3>
+        <span class="chevron">⌄</span>
+      </div>
+
+      <div class="section-body">
+        <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
+
+        <div class="days-picker">
+          <label><input type="checkbox" value="1">Seg</label>
+          <label><input type="checkbox" value="2">Ter</label>
+          <label><input type="checkbox" value="3">Qua</label>
+          <label><input type="checkbox" value="4">Qui</label>
+          <label><input type="checkbox" value="5">Sex</label>
+          <label><input type="checkbox" value="6">Sáb</label>
+          <label><input type="checkbox" value="0">Dom</label>
+        </div>
+
+        <div class="time-grid">
+          <div><p class="subtitle">Início</p><input type="time" id="taskStart" value="08:00" /></div>
+          <div><p class="subtitle">Fim</p><input type="time" id="taskEnd" value="08:30" /></div>
+        </div>
+
+        <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
+        <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
+        <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
+      </div>
     </div>
 
-    <div class="card">
-      <h3 class="section-title">Memória dos últimos dias</h3>
-      <div id="historyList"></div>
+    <div class="card collapsed" id="tomorrowCard">
+      <div class="section-header" onclick="toggleCollapse('tomorrowCard')">
+        <h3 class="section-title">Próximo dia</h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body">
+        <p class="subtitle" id="tomorrowLabel" style="margin-bottom:10px;"></p>
+        <div id="tomorrowList"></div>
+      </div>
     </div>
 
-    <div class="card">
-      <h3 class="section-title">Backup / Sincronizar celular</h3>
-      <p class="subtitle" style="margin-bottom:10px;">Use isso para passar dados do PC para o celular.</p>
-      <button class="add-btn" onclick="exportData()">Exportar dados</button>
-      <textarea id="syncBox" placeholder="Aqui aparece o backup. No outro aparelho, cole aqui e clique em Importar."></textarea>
-      <button class="add-btn" onclick="importData()">Importar dados</button>
+    <div class="card collapsed" id="historyCard">
+      <div class="section-header" onclick="toggleCollapse('historyCard')">
+        <h3 class="section-title">Memória dos últimos dias</h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body" id="historyList"></div>
+    </div>
+
+    <div class="card collapsed" id="backupCard">
+      <div class="section-header" onclick="toggleCollapse('backupCard')">
+        <h3 class="section-title">Backup / Sincronizar</h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body">
+        <p class="subtitle" style="margin-bottom:10px;">Para levar dados do PC ao celular: exporte no PC, copie o texto e importe no celular.</p>
+        <button class="add-btn" onclick="exportData()">Exportar dados</button>
+        <textarea id="syncBox" placeholder="Aqui aparece o backup. No outro aparelho, cole aqui e clique em Importar."></textarea>
+        <button class="add-btn" onclick="importData()">Importar dados</button>
+      </div>
     </div>
 
     <div class="footer">FOM App • Focus On Mission • by Gabriel</div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <script>
     const days = [
-      { id: 1, name: "SEG", full: "Segunda-feira" }, { id: 2, name: "TER", full: "Terça-feira" },
-      { id: 3, name: "QUA", full: "Quarta-feira" }, { id: 4, name: "QUI", full: "Quinta-feira" },
-      { id: 5, name: "SEX", full: "Sexta-feira" }, { id: 6, name: "SÁB", full: "Sábado" },
+      { id: 1, name: "SEG", full: "Segunda-feira" },
+      { id: 2, name: "TER", full: "Terça-feira" },
+      { id: 3, name: "QUA", full: "Quarta-feira" },
+      { id: 4, name: "QUI", full: "Quinta-feira" },
+      { id: 5, name: "SEX", full: "Sexta-feira" },
+      { id: 6, name: "SÁB", full: "Sábado" },
       { id: 0, name: "DOM", full: "Domingo" }
     ];
 
     let editingTaskId = null;
-    let soundEnabled = JSON.parse(localStorage.getItem("fom_sound") || "true");
-    let lastDailyCelebration = localStorage.getItem("fom_last_daily_celebration") || "";
-    let lastWeeklyCelebration = localStorage.getItem("fom_last_weekly_celebration") || "";
+    let compactAgenda = JSON.parse(localStorage.getItem("fom_compact_agenda")) || false;
+    let soundEnabled = JSON.parse(localStorage.getItem("fom_sound_enabled")) || false;
+    let lastCelebratedDay = localStorage.getItem("fom_last_day_celebrated") || "";
+    let lastCelebratedWeek = localStorage.getItem("fom_last_week_celebrated") || "";
 
     let tasks = JSON.parse(localStorage.getItem("fom_tasks")) || [
       { id: Date.now() + 1, days: [1,2,3,4,5], start: "07:30", end: "08:00", title: "Estudar inglês", doneDates: [] },
@@ -180,17 +599,43 @@
     });
 
     save();
+    updateSoundIcon();
 
-    function save() { localStorage.setItem("fom_tasks", JSON.stringify(tasks)); }
-    function todayKey(offset = 0) { const d = new Date(); d.setDate(d.getDate() + offset); return d.toISOString().slice(0, 10); }
-    function getDayFromDate(dateKey) { return new Date(dateKey + "T12:00:00").getDay(); }
-    function todayDay() { return new Date().getDay(); }
-    function getDayName(dayId) { return days.find(d => d.id === dayId)?.full || ""; }
-    function getTasksByDate(dateKey) { const day = getDayFromDate(dateKey); return tasks.filter(t => t.days.includes(day)).sort((a,b) => a.start.localeCompare(b.start)); }
+    function save() {
+      localStorage.setItem("fom_tasks", JSON.stringify(tasks));
+    }
+
+    function todayKey(offset = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function getDayFromDate(dateKey) {
+      return new Date(dateKey + "T12:00:00").getDay();
+    }
+
+    function todayDay() {
+      return new Date().getDay();
+    }
+
+    function getDayName(dayId) {
+      return days.find(d => d.id === dayId)?.full || "";
+    }
+
+    function getTasksByDate(dateKey) {
+      const day = getDayFromDate(dateKey);
+      return tasks.filter(t => t.days.includes(day)).sort((a,b) => a.start.localeCompare(b.start));
+    }
+
     function getProgressByDate(dateKey) {
       const dateTasks = getTasksByDate(dateKey);
       const done = dateTasks.filter(t => t.doneDates.includes(dateKey)).length;
-      return { total: dateTasks.length, done, percent: dateTasks.length ? Math.round((done / dateTasks.length) * 100) : 0 };
+      return {
+        total: dateTasks.length,
+        done,
+        percent: dateTasks.length ? Math.round((done / dateTasks.length) * 100) : 0
+      };
     }
 
     function render() {
@@ -200,37 +645,79 @@
 
       document.getElementById("todayPercent").innerText = progress.percent + "%";
       document.getElementById("progressFill").style.width = progress.percent + "%";
-      document.getElementById("todayCount").innerText = `${progress.done} de ${progress.total} missões concluídas`;
+      document.getElementById("todayCount").innerText = `${progress.done} de ${progress.total} ${progress.total === 1 ? "missão concluída" : "missões concluídas"}`;
       document.getElementById("streak").innerText = calculateStreak() + "🔥";
-      document.getElementById("soundBtn").innerText = soundEnabled ? "🔊 ON" : "🔇 OFF";
 
-      const notice = document.getElementById("notice");
-      if (progress.percent === 100 && progress.total > 0) notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
-      else if (progress.total === 0) notice.innerText = "Hoje ainda não tem missão cadastrada. Crie uma missão para começar sua ofensiva.";
-      else notice.innerText = `Faltam ${progress.total - progress.done} missão(ões) para fechar 100% hoje.`;
-
+      renderNotice(progress);
       renderTasks(todayTasks, today);
       renderTimeline();
       renderTomorrow();
       renderHistory();
     }
 
+    function renderNotice(progress) {
+      const notice = document.getElementById("notice");
+      const missing = progress.total - progress.done;
+
+      if (progress.percent === 100 && progress.total > 0) {
+        notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
+      } else if (progress.total === 0) {
+        notice.innerText = "Hoje ainda não tem missão cadastrada. Crie uma missão para começar sua ofensiva.";
+      } else if (missing === 1) {
+        notice.innerText = "Falta 1 missão para fechar 100% hoje.";
+      } else {
+        notice.innerText = `Faltam ${missing} missões para fechar 100% hoje.`;
+      }
+    }
+
+    function minutesNow() {
+      const d = new Date();
+      return d.getHours() * 60 + d.getMinutes();
+    }
+
+    function timeToMinutes(time) {
+      const [h, m] = time.split(":").map(Number);
+      return h * 60 + m;
+    }
+
+    function getTaskStatus(task, dateKey) {
+      if (task.doneDates.includes(dateKey)) return "done";
+      const now = minutesNow();
+      const start = timeToMinutes(task.start);
+      const end = timeToMinutes(task.end);
+
+      if (now > end) return "late";
+      if (now >= start && now <= end) return "next";
+      return "";
+    }
+
     function renderTasks(todayTasks, today) {
       const list = document.getElementById("tasksList");
-      if (!todayTasks.length) { list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`; return; }
+
+      if (!todayTasks.length) {
+        list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`;
+        return;
+      }
 
       list.innerHTML = todayTasks.map(task => {
         const done = task.doneDates.includes(today);
         const programmedDays = task.days.map(id => days.find(d => d.id === id)?.name).join(", ");
+        const status = getTaskStatus(task, today);
+        const statusLabel = status === "late" ? " • atrasada" : status === "next" ? " • agora" : "";
+
         return `
-          <div class="task ${done ? "done" : ""}" id="task-${task.id}">
-            <div><small>${task.start} - ${task.end} • ${programmedDays}</small><strong>${task.title}</strong></div>
+          <div class="task ${done ? "done" : ""} ${status}" id="task-${task.id}">
+            <div>
+              <small>${task.start} - ${task.end}${compactAgenda ? "" : " • " + programmedDays}${statusLabel}</small>
+              <strong>${task.title}</strong>
+            </div>
             <div class="task-actions">
               <button class="icon-btn edit" onclick="editTask(${task.id})">✏️</button>
-              <button onclick="toggleDone(${task.id})">${done ? "Feito" : "Concluir"}</button>
+              <button class="done-btn ${done ? "done" : ""}" onclick="toggleDone(${task.id})">${done ? "Feito" : "Concluir"}</button>
               <button class="delete icon-btn" onclick="deleteTask(${task.id})">X</button>
             </div>
-          </div>`;
+          </div>
+        `;
       }).join("");
     }
 
@@ -243,7 +730,15 @@
         if (offset > 0) offset -= 7;
         const date = todayKey(offset);
         const progress = getProgressByDate(date);
-        return `<div class="day"><div class="circle ${progress.percent === 100 && progress.total > 0 ? "done" : ""}">${progress.percent}%</div>${d.name}</div>`;
+
+        return `
+          <div class="day">
+            <div class="circle ${progress.percent === 100 && progress.total > 0 ? "done" : ""}">
+              ${progress.percent}%
+            </div>
+            ${d.name}
+          </div>
+        `;
       }).join("");
     }
 
@@ -251,21 +746,41 @@
       const tomorrowDate = todayKey(1);
       const tomorrowDay = getDayFromDate(tomorrowDate);
       const tomorrowTasks = getTasksByDate(tomorrowDate);
+
       document.getElementById("tomorrowLabel").innerText = `Resumo de ${getDayName(tomorrowDay)}`;
       const list = document.getElementById("tomorrowList");
-      if (!tomorrowTasks.length) { list.innerHTML = `<div class="empty">Nenhuma missão programada para o próximo dia.</div>`; return; }
-      list.innerHTML = tomorrowTasks.map(task => `<div class="summary-item"><small>${task.start} - ${task.end}</small><strong>${task.title}</strong></div>`).join("");
+
+      if (!tomorrowTasks.length) {
+        list.innerHTML = `<div class="empty">Nenhuma missão programada para o próximo dia.</div>`;
+        return;
+      }
+
+      list.innerHTML = tomorrowTasks.map(task => `
+        <div class="summary-item">
+          <small>${task.start} - ${task.end}</small>
+          <strong>${task.title}</strong>
+        </div>
+      `).join("");
     }
 
     function renderHistory() {
       const list = document.getElementById("historyList");
       let html = "";
+
       for (let i = 0; i < 7; i++) {
         const date = todayKey(-i);
         const day = getDayFromDate(date);
         const p = getProgressByDate(date);
-        html += `<div class="history-item"><small>${date} • ${getDayName(day)}</small><strong>${p.percent}%</strong><span class="subtitle"> • ${p.done} de ${p.total} missões</span></div>`;
+
+        html += `
+          <div class="history-item">
+            <small>${date} • ${getDayName(day)}</small>
+            <strong>${p.percent}%</strong>
+            <span class="subtitle"> • ${p.done} de ${p.total} ${p.total === 1 ? "missão" : "missões"}</span>
+          </div>
+        `;
       }
+
       list.innerHTML = html;
     }
 
@@ -274,34 +789,63 @@
       const start = document.getElementById("taskStart").value;
       const end = document.getElementById("taskEnd").value;
       const title = document.getElementById("taskTitle").value.trim();
-      if (!selectedDays.length) return alert("Selecione pelo menos um dia da semana."), null;
-      if (!start || !end) return alert("Informe o horário de início e fim."), null;
-      if (end <= start) return alert("O horário de fim precisa ser maior que o horário de início."), null;
-      if (!title) return alert("Digite o nome da missão."), null;
+
+      if (!selectedDays.length) return showToast("Selecione pelo menos um dia da semana."), null;
+      if (!start || !end) return showToast("Informe início e fim."), null;
+      if (end <= start) return showToast("O fim precisa ser maior que o início."), null;
+      if (!title) return showToast("Digite o nome da missão."), null;
+
       return { selectedDays, start, end, title };
     }
 
     function saveTaskFromForm() {
+      unlockAudio();
       const data = getFormData();
       if (!data) return;
+
       if (editingTaskId) {
-        tasks = tasks.map(task => task.id !== editingTaskId ? task : { ...task, days: data.selectedDays, start: data.start, end: data.end, title: data.title });
+        tasks = tasks.map(task => task.id !== editingTaskId ? task : {
+          ...task,
+          days: data.selectedDays,
+          start: data.start,
+          end: data.end,
+          title: data.title
+        });
         cancelEdit(false);
+        showToast("Missão editada com sucesso.");
+        playMissionSound();
       } else {
-        tasks.push({ id: Date.now(), days: data.selectedDays, start: data.start, end: data.end, title: data.title, doneDates: [] });
+        tasks.push({
+          id: Date.now(),
+          days: data.selectedDays,
+          start: data.start,
+          end: data.end,
+          title: data.title,
+          doneDates: []
+        });
         clearForm();
+        showToast("Missão adicionada com sucesso.");
+        playMissionSound();
       }
-      save(); render();
+
+      save();
+      render();
     }
 
     function editTask(id) {
       const task = tasks.find(t => t.id === id);
       if (!task) return;
+
       editingTaskId = id;
+      document.getElementById("formCard").classList.remove("collapsed");
       document.getElementById("formTitle").innerText = "Editar missão";
       document.getElementById("saveTaskBtn").innerText = "Salvar alteração";
       document.getElementById("cancelEditBtn").style.display = "block";
-      document.querySelectorAll(".days-picker input").forEach(input => { input.checked = task.days.includes(Number(input.value)); });
+
+      document.querySelectorAll(".days-picker input").forEach(input => {
+        input.checked = task.days.includes(Number(input.value));
+      });
+
       document.getElementById("taskStart").value = task.start;
       document.getElementById("taskEnd").value = task.end;
       document.getElementById("taskTitle").value = task.title;
@@ -325,25 +869,38 @@
     }
 
     function toggleDone(id) {
+      unlockAudio();
       const today = todayKey();
       const before = getProgressByDate(today);
-      let completedNow = false;
 
       tasks = tasks.map(task => {
         if (task.id !== id) return task;
         const alreadyDone = task.doneDates.includes(today);
-        completedNow = !alreadyDone;
-        return { ...task, doneDates: alreadyDone ? task.doneDates.filter(d => d !== today) : [...task.doneDates, today] };
+        return {
+          ...task,
+          doneDates: alreadyDone ? task.doneDates.filter(d => d !== today) : [...task.doneDates, today]
+        };
       });
 
       save();
       render();
 
-      if (completedNow) {
-        celebrateMission(id);
-        const after = getProgressByDate(today);
-        if (before.percent < 100 && after.percent === 100 && after.total > 0) celebrateDay100(today);
-        checkWeeklyPerfect();
+      const after = getProgressByDate(today);
+      const task = tasks.find(t => t.id === id);
+
+      if (task && task.doneDates.includes(today)) {
+        showToast("Missão concluída. Boa!");
+        playMissionSound();
+        vibrate([60, 30, 80]);
+        pulseTask(id);
+
+        if (before.percent < 100 && after.percent === 100 && after.total > 0) {
+          celebrateDay(today);
+        }
+
+        checkPerfectWeek();
+      } else {
+        showToast("Missão reaberta.");
       }
     }
 
@@ -351,149 +908,243 @@
       if (!confirm("Deseja excluir essa missão?")) return;
       tasks = tasks.filter(task => task.id !== id);
       if (editingTaskId === id) cancelEdit(false);
-      save(); render();
+      save();
+      render();
+      showToast("Missão excluída.");
     }
 
     function calculateStreak() {
       let streak = 0;
+
       for (let i = 0; i < 365; i++) {
         const date = todayKey(-i);
         const p = getProgressByDate(date);
+
         if (!p.total) break;
         if (p.percent === 100) streak++;
         else break;
       }
+
       return streak;
     }
 
-    function exportData() {
-      const backup = { app: "FOM", version: 3, exportedAt: new Date().toISOString(), tasks };
-      document.getElementById("syncBox").value = btoa(unescape(encodeURIComponent(JSON.stringify(backup))));
-      alert("Backup gerado. Copie esse texto e cole no celular.");
+    function isPerfectWeek() {
+      for (let i = 0; i < 7; i++) {
+        const p = getProgressByDate(-i);
+      }
     }
 
-    function importData() {
-      const text = document.getElementById("syncBox").value.trim();
-      if (!text) { alert("Cole o backup antes de importar."); return; }
-      try {
-        const backup = JSON.parse(decodeURIComponent(escape(atob(text))));
-        if (!backup.tasks || !Array.isArray(backup.tasks)) { alert("Backup inválido."); return; }
-        if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
-        tasks = backup.tasks; save(); render(); alert("Dados importados com sucesso.");
-      } catch (e) { alert("Não foi possível importar. Verifique se copiou o backup completo."); }
+    function getWeekKey() {
+      const d = new Date();
+      const firstJan = new Date(d.getFullYear(), 0, 1);
+      const pastDays = Math.floor((d - firstJan) / 86400000);
+      const week = Math.ceil((pastDays + firstJan.getDay() + 1) / 7);
+      return `${d.getFullYear()}-W${week}`;
     }
 
-    function toggleSound() {
-      soundEnabled = !soundEnabled;
-      localStorage.setItem("fom_sound", JSON.stringify(soundEnabled));
-      render();
-      if (soundEnabled) playTone([520, 680], 0.08, "sine");
+    function checkPerfectWeek() {
+      const weekKey = getWeekKey();
+      if (lastCelebratedWeek === weekKey) return;
+
+      for (let i = 0; i < 7; i++) {
+        const date = todayKey(-i);
+        const p = getProgressByDate(date);
+        if (!p.total || p.percent < 100) return;
+      }
+
+      lastCelebratedWeek = weekKey;
+      localStorage.setItem("fom_last_week_celebrated", weekKey);
+
+      playWeekSound();
+      fireConfetti(260);
+      showAchievement("🏆", "Semana perfeita!", "Persistência vence intensidade. Você construiu essa semana missão por missão.");
     }
 
-    function playTone(freqs, duration = 0.12, type = "sine") {
-      if (!soundEnabled) return;
-      try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        const ctx = new AudioContext();
-        let start = ctx.currentTime;
-        freqs.forEach((freq, i) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = type;
-          osc.frequency.setValueAtTime(freq, start + i * duration);
-          gain.gain.setValueAtTime(0.0001, start + i * duration);
-          gain.gain.exponentialRampToValueAtTime(0.18, start + i * duration + 0.015);
-          gain.gain.exponentialRampToValueAtTime(0.0001, start + (i + 1) * duration);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(start + i * duration);
-          osc.stop(start + (i + 1) * duration + 0.02);
-        });
-      } catch(e) {}
+    function celebrateDay(dateKey) {
+      if (lastCelebratedDay === dateKey) return;
+
+      lastCelebratedDay = dateKey;
+      localStorage.setItem("fom_last_day_celebrated", dateKey);
+
+      playDaySound();
+      fireConfetti(180);
+      vibrate([100, 50, 160, 50, 220]);
+      showAchievement("🔥", "Dia 100% fechado!", "Ofensiva protegida. Hoje você fez o que precisava ser feito.");
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById("toast");
+      toast.innerText = text;
+      toast.classList.add("show");
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function showAchievement(icon, title, text) {
+      document.getElementById("achievementIcon").innerText = icon;
+      document.getElementById("achievementTitle").innerText = title;
+      document.getElementById("achievementText").innerText = text;
+      document.getElementById("achievementOverlay").classList.add("show");
+    }
+
+    function closeAchievement() {
+      document.getElementById("achievementOverlay").classList.remove("show");
+    }
+
+    function fireConfetti(count) {
+      if (typeof confetti === "function") {
+        confetti({ particleCount: count, spread: 120, origin: { y: .68 } });
+        setTimeout(() => confetti({ particleCount: Math.round(count * .45), spread: 90, origin: { y: .45 } }), 280);
+      }
     }
 
     function vibrate(pattern) {
       if (navigator.vibrate) navigator.vibrate(pattern);
     }
 
-    function showToast(title, text, ms = 2300) {
-      const toast = document.getElementById("toast");
-      document.getElementById("toastTitle").innerText = title;
-      document.getElementById("toastText").innerText = text;
-      toast.classList.add("show");
-      setTimeout(() => toast.classList.remove("show"), ms);
+    function unlockAudio() {
+      if (soundEnabled) return;
+      soundEnabled = true;
+      localStorage.setItem("fom_sound_enabled", JSON.stringify(soundEnabled));
+      updateSoundIcon();
     }
 
-    function pulseScreen() {
-      const root = document.getElementById("pulseRoot");
-      const div = document.createElement("div");
-      div.className = "pulse-screen";
-      root.appendChild(div);
-      setTimeout(() => div.remove(), 1000);
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("fom_sound_enabled", JSON.stringify(soundEnabled));
+      updateSoundIcon();
+      showToast(soundEnabled ? "Som ativado." : "Som desativado.");
+      if (soundEnabled) playMissionSound();
     }
 
-    function confetti(amount = 60) {
-      const root = document.getElementById("celebration");
-      const colors = ["#00e5ff", "#8b5cf6", "#ff4ecd", "#22c55e", "#f59e0b", "#ffffff"];
-      for (let i = 0; i < amount; i++) {
-        const piece = document.createElement("div");
-        piece.className = "confetti";
-        piece.style.left = Math.random() * 100 + "vw";
-        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-        piece.style.animationDelay = Math.random() * 0.35 + "s";
-        piece.style.animationDuration = (1.1 + Math.random() * 1.2) + "s";
-        root.appendChild(piece);
-        setTimeout(() => piece.remove(), 2600);
-      }
+    function updateSoundIcon() {
+      document.getElementById("soundToggle").innerText = soundEnabled ? "🔊" : "🔇";
     }
 
-    function celebrateMission(id) {
-      playTone([640, 860], 0.07, "sine");
-      vibrate(35);
-      showToast("Missão concluída ⚡", "Boa. Uma missão a menos entre você e os 100%.");
-      const el = document.getElementById("task-" + id);
-      if (el) {
-        el.classList.add("flash");
-        setTimeout(() => el.classList.remove("flash"), 550);
-      }
+    function playTone(freq, duration, type = "triangle", volume = .08) {
+      if (!soundEnabled) return;
+
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        gain.gain.setValueAtTime(volume, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.0001, ctx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch(e) {}
     }
 
-    function celebrateDay100(date) {
-      if (lastDailyCelebration === date) return;
-      lastDailyCelebration = date;
-      localStorage.setItem("fom_last_daily_celebration", date);
-      playTone([523, 659, 784, 1046], 0.11, "triangle");
-      vibrate([80, 40, 120]);
-      pulseScreen();
-      confetti(85);
-      showToast("Dia 100% fechado 🎉", "Ofensiva protegida. Hoje você cumpriu o combinado.", 3200);
+    function playMissionSound() {
+      playTone(520, .16, "triangle", .07);
+      setTimeout(() => playTone(780, .18, "triangle", .06), 110);
     }
 
-    function isLast7DaysPerfect() {
-      for (let i = 0; i < 7; i++) {
-        const p = getProgressByDate(todayKey(-i));
-        if (!p.total || p.percent !== 100) return false;
-      }
-      return true;
+    function playDaySound() {
+      playTone(440, .18, "sine", .08);
+      setTimeout(() => playTone(660, .18, "sine", .08), 130);
+      setTimeout(() => playTone(990, .26, "triangle", .08), 260);
     }
 
-    function checkWeeklyPerfect() {
+    function playWeekSound() {
+      playTone(392, .18, "sine", .08);
+      setTimeout(() => playTone(523, .18, "sine", .08), 120);
+      setTimeout(() => playTone(659, .18, "sine", .08), 240);
+      setTimeout(() => playTone(1046, .32, "triangle", .08), 380);
+    }
+
+    function pulseTask(id) {
+      const el = document.getElementById(`task-${id}`);
+      if (!el) return;
+      el.animate([
+        { transform: "scale(1)", boxShadow: "0 0 0 rgba(0,229,255,0)" },
+        { transform: "scale(1.025)", boxShadow: "0 0 28px rgba(0,229,255,.55)" },
+        { transform: "scale(1)", boxShadow: "0 0 0 rgba(0,229,255,0)" }
+      ], { duration: 520, easing: "ease-out" });
+    }
+
+    function scrollToNextMission() {
       const today = todayKey();
-      if (!isLast7DaysPerfect()) return;
-      if (lastWeeklyCelebration === today) return;
-      lastWeeklyCelebration = today;
-      localStorage.setItem("fom_last_weekly_celebration", today);
-      playTone([392, 523, 659, 784, 1046], 0.12, "triangle");
-      vibrate([120, 60, 120, 60, 180]);
-      confetti(130);
-      pulseScreen();
-      document.getElementById("weeklyModal").style.display = "flex";
+      const todayTasks = getTasksByDate(today);
+      const next = todayTasks.find(t => !t.doneDates.includes(today) && timeToMinutes(t.end) >= minutesNow())
+        || todayTasks.find(t => !t.doneDates.includes(today));
+
+      if (!next) {
+        showToast("Nenhuma missão pendente hoje.");
+        return;
+      }
+
+      const el = document.getElementById(`task-${next.id}`);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
-    function closeWeeklyModal() {
-      document.getElementById("weeklyModal").style.display = "none";
+    function toggleCompactAgenda() {
+      compactAgenda = !compactAgenda;
+      localStorage.setItem("fom_compact_agenda", JSON.stringify(compactAgenda));
+      render();
+      showToast(compactAgenda ? "Agenda compacta ativada." : "Agenda completa ativada.");
     }
 
+    function toggleCollapse(id) {
+      document.getElementById(id).classList.toggle("collapsed");
+    }
+
+    function exportData() {
+      const backup = {
+        app: "FOM",
+        version: 3,
+        exportedAt: new Date().toISOString(),
+        tasks,
+        settings: { compactAgenda, soundEnabled }
+      };
+
+      document.getElementById("syncBox").value = btoa(unescape(encodeURIComponent(JSON.stringify(backup))));
+      showToast("Backup gerado. Copie e cole no outro aparelho.");
+    }
+
+    function importData() {
+      const text = document.getElementById("syncBox").value.trim();
+
+      if (!text) {
+        showToast("Cole o backup antes de importar.");
+        return;
+      }
+
+      try {
+        const backup = JSON.parse(decodeURIComponent(escape(atob(text))));
+
+        if (!backup.tasks || !Array.isArray(backup.tasks)) {
+          showToast("Backup inválido.");
+          return;
+        }
+
+        if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
+
+        tasks = backup.tasks;
+        compactAgenda = !!backup.settings?.compactAgenda;
+        soundEnabled = !!backup.settings?.soundEnabled;
+
+        localStorage.setItem("fom_compact_agenda", JSON.stringify(compactAgenda));
+        localStorage.setItem("fom_sound_enabled", JSON.stringify(soundEnabled));
+
+        updateSoundIcon();
+        save();
+        render();
+        showToast("Dados importados com sucesso.");
+      } catch (e) {
+        showToast("Não foi possível importar. Verifique o backup.");
+      }
+    }
+
+    setInterval(render, 60000);
     render();
   </script>
 </body>
