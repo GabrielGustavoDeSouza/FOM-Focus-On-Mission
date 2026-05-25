@@ -91,13 +91,28 @@
 
     .task small { color: #aab6ff; display: block; margin-bottom: 4px; }
 
+    .task-actions {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      min-width: 42px;
+      padding: 11px;
+    }
+
+    .edit {
+      background: linear-gradient(135deg, #f59e0b, #ec4899);
+    }
+
     button {
       border: none; border-radius: 14px; padding: 11px 13px;
       color: white; font-weight: bold; cursor: pointer;
       background: linear-gradient(135deg, #2563eb, #8b5cf6);
     }
 
-    .delete { background: #ef4444; margin-left: 5px; }
+    .delete { background: #ef4444; }
 
     input {
       width: 100%; padding: 13px; margin-bottom: 10px; border-radius: 14px;
@@ -139,11 +154,31 @@
       background: linear-gradient(135deg, #00e5ff, #8b5cf6);
     }
 
+    .cancel-btn {
+      width: 100%;
+      margin-top: 8px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
     .empty {
       color: #aab6ff;
       font-size: 14px;
       text-align: center;
       padding: 12px;
+    }
+
+    .summary-item {
+      background: rgba(0, 0, 0, 0.22);
+      border-radius: 16px;
+      padding: 12px;
+      margin-bottom: 8px;
+    }
+
+    .summary-item small {
+      color: #aab6ff;
+      display: block;
+      margin-bottom: 3px;
     }
 
     .footer {
@@ -198,7 +233,7 @@
     </div>
 
     <div class="card">
-      <h3 class="section-title">Adicionar missão</h3>
+      <h3 class="section-title" id="formTitle">Adicionar missão</h3>
 
       <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
 
@@ -226,7 +261,14 @@
 
       <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
 
-      <button class="add-btn" onclick="addTask()">Adicionar missão</button>
+      <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
+      <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Próximo dia</h3>
+      <p class="subtitle" id="tomorrowLabel" style="margin-bottom:10px;"></p>
+      <div id="tomorrowList"></div>
     </div>
 
     <div class="footer">
@@ -236,14 +278,16 @@
 
   <script>
     const days = [
-      { id: 1, name: "SEG" },
-      { id: 2, name: "TER" },
-      { id: 3, name: "QUA" },
-      { id: 4, name: "QUI" },
-      { id: 5, name: "SEX" },
-      { id: 6, name: "SÁB" },
-      { id: 0, name: "DOM" }
+      { id: 1, name: "SEG", full: "Segunda-feira" },
+      { id: 2, name: "TER", full: "Terça-feira" },
+      { id: 3, name: "QUA", full: "Quarta-feira" },
+      { id: 4, name: "QUI", full: "Quinta-feira" },
+      { id: 5, name: "SEX", full: "Sexta-feira" },
+      { id: 6, name: "SÁB", full: "Sábado" },
+      { id: 0, name: "DOM", full: "Domingo" }
     ];
+
+    let editingTaskId = null;
 
     let tasks = JSON.parse(localStorage.getItem("fom_tasks")) || [
       { id: Date.now() + 1, days: [1,2,3,4,5], start: "07:30", end: "08:00", title: "Estudar inglês", doneDates: [] },
@@ -251,18 +295,9 @@
     ];
 
     tasks = tasks.map(task => {
-      if (!task.days && task.day !== undefined) {
-        task.days = [Number(task.day)];
-      }
-
-      if (!task.start && task.time) {
-        task.start = task.time;
-      }
-
-      if (!task.end) {
-        task.end = task.start || "08:30";
-      }
-
+      if (!task.days && task.day !== undefined) task.days = [Number(task.day)];
+      if (!task.start && task.time) task.start = task.time;
+      if (!task.end) task.end = task.start || "08:30";
       return task;
     });
 
@@ -284,6 +319,11 @@
 
     function todayDay() {
       return new Date().getDay();
+    }
+
+    function getDayName(dayId) {
+      const found = days.find(d => d.id === dayId);
+      return found ? found.full : "";
     }
 
     function render() {
@@ -314,6 +354,7 @@
 
       renderTasks(todayTasks, today);
       renderTimeline();
+      renderTomorrow();
     }
 
     function renderTasks(todayTasks, today) {
@@ -326,16 +367,20 @@
 
       list.innerHTML = todayTasks.map(task => {
         const done = task.doneDates.includes(today);
+        const programmedDays = task.days
+          .map(id => days.find(d => d.id === id)?.name)
+          .join(", ");
 
         return `
           <div class="task ${done ? "done" : ""}">
             <div>
-              <small>${task.start} - ${task.end}</small>
+              <small>${task.start} - ${task.end} • ${programmedDays}</small>
               <strong>${task.title}</strong>
             </div>
-            <div>
+            <div class="task-actions">
+              <button class="icon-btn edit" onclick="editTask(${task.id})">✏️</button>
               <button onclick="toggleDone(${task.id})">${done ? "Feito" : "Concluir"}</button>
-              <button class="delete" onclick="deleteTask(${task.id})">X</button>
+              <button class="delete icon-btn" onclick="deleteTask(${task.id})">X</button>
             </div>
           </div>
         `;
@@ -368,7 +413,33 @@
       }).join("");
     }
 
-    function addTask() {
+    function renderTomorrow() {
+      const tomorrowDate = todayKey(1);
+      const tomorrowDay = getDayFromDate(tomorrowDate);
+
+      const tomorrowTasks = tasks
+        .filter(t => t.days.includes(tomorrowDay))
+        .sort((a, b) => a.start.localeCompare(b.start));
+
+      document.getElementById("tomorrowLabel").innerText =
+        `Resumo de ${getDayName(tomorrowDay)}`;
+
+      const list = document.getElementById("tomorrowList");
+
+      if (!tomorrowTasks.length) {
+        list.innerHTML = `<div class="empty">Nenhuma missão programada para o próximo dia.</div>`;
+        return;
+      }
+
+      list.innerHTML = tomorrowTasks.map(task => `
+        <div class="summary-item">
+          <small>${task.start} - ${task.end}</small>
+          <strong>${task.title}</strong>
+        </div>
+      `).join("");
+    }
+
+    function getFormData() {
       const selectedDays = Array.from(document.querySelectorAll(".days-picker input:checked"))
         .map(input => Number(input.value));
 
@@ -378,38 +449,100 @@
 
       if (!selectedDays.length) {
         alert("Selecione pelo menos um dia da semana.");
-        return;
+        return null;
       }
 
       if (!start || !end) {
         alert("Informe o horário de início e fim.");
-        return;
+        return null;
       }
 
       if (end <= start) {
         alert("O horário de fim precisa ser maior que o horário de início.");
-        return;
+        return null;
       }
 
       if (!title) {
         alert("Digite o nome da missão.");
-        return;
+        return null;
       }
 
-      tasks.push({
-        id: Date.now(),
-        days: selectedDays,
-        start,
-        end,
-        title,
-        doneDates: []
-      });
+      return { selectedDays, start, end, title };
+    }
 
-      document.getElementById("taskTitle").value = "";
-      document.querySelectorAll(".days-picker input").forEach(input => input.checked = false);
+    function saveTaskFromForm() {
+      const data = getFormData();
+      if (!data) return;
+
+      if (editingTaskId) {
+        tasks = tasks.map(task => {
+          if (task.id !== editingTaskId) return task;
+
+          return {
+            ...task,
+            days: data.selectedDays,
+            start: data.start,
+            end: data.end,
+            title: data.title
+          };
+        });
+
+        cancelEdit(false);
+      } else {
+        tasks.push({
+          id: Date.now(),
+          days: data.selectedDays,
+          start: data.start,
+          end: data.end,
+          title: data.title,
+          doneDates: []
+        });
+
+        clearForm();
+      }
 
       save();
       render();
+    }
+
+    function editTask(id) {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+
+      editingTaskId = id;
+
+      document.getElementById("formTitle").innerText = "Editar missão";
+      document.getElementById("saveTaskBtn").innerText = "Salvar alteração";
+      document.getElementById("cancelEditBtn").style.display = "block";
+
+      document.querySelectorAll(".days-picker input").forEach(input => {
+        input.checked = task.days.includes(Number(input.value));
+      });
+
+      document.getElementById("taskStart").value = task.start;
+      document.getElementById("taskEnd").value = task.end;
+      document.getElementById("taskTitle").value = task.title;
+
+      document.getElementById("formTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function cancelEdit(shouldRender = true) {
+      editingTaskId = null;
+
+      document.getElementById("formTitle").innerText = "Adicionar missão";
+      document.getElementById("saveTaskBtn").innerText = "Adicionar missão";
+      document.getElementById("cancelEditBtn").style.display = "none";
+
+      clearForm();
+
+      if (shouldRender) render();
+    }
+
+    function clearForm() {
+      document.getElementById("taskTitle").value = "";
+      document.getElementById("taskStart").value = "08:00";
+      document.getElementById("taskEnd").value = "08:30";
+      document.querySelectorAll(".days-picker input").forEach(input => input.checked = false);
     }
 
     function toggleDone(id) {
@@ -435,6 +568,9 @@
     function deleteTask(id) {
       if (!confirm("Deseja excluir essa missão?")) return;
       tasks = tasks.filter(task => task.id !== id);
+
+      if (editingTaskId === id) cancelEdit(false);
+
       save();
       render();
     }
