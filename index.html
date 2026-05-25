@@ -4,59 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FOM - Focus On Mission</title>
-
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    body { min-height: 100vh; background: radial-gradient(circle at top, #1d2bff 0%, #09091f 40%, #03030a 100%); color: white; padding: 18px; }
+    body { min-height: 100vh; background: radial-gradient(circle at top, #1d2bff 0%, #09091f 40%, #03030a 100%); color: white; padding: 18px; overflow-x:hidden; }
     .app { max-width: 430px; margin: 0 auto; padding-bottom: 30px; }
     .header { text-align: center; margin-top: 12px; margin-bottom: 24px; }
     .logo { font-size: 42px; font-weight: bold; }
     .subtitle { color: #b8c7ff; font-size: 14px; margin-top: 4px; }
-
     .card { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.13); border-radius: 24px; padding: 18px; margin-bottom: 16px; box-shadow: 0 15px 40px rgba(0,0,0,.35); backdrop-filter: blur(12px); }
     .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .metric h2 { font-size: 34px; margin-top: 6px; }
     .metric p { color: #b8c7ff; font-size: 13px; }
-
     .progress-bar { width: 100%; height: 14px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-top: 12px; }
     .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#00e5ff,#8b5cf6,#ff4ecd); border-radius: 99px; transition: .4s; }
-
     .notice { background: linear-gradient(135deg,#6d28d9,#2563eb); border-radius: 22px; padding: 16px; margin-bottom: 16px; font-weight: bold; line-height: 1.4; }
-
     .timeline { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; position: relative; }
     .timeline::before { content: ""; position: absolute; top: 21px; left: 20px; right: 20px; height: 4px; background: rgba(255,255,255,.18); z-index: 0; border-radius: 10px; }
     .day { position: relative; z-index: 1; text-align: center; font-size: 11px; color: #cbd5ff; }
     .circle { width: 42px; height: 42px; border-radius: 50%; background: #111827; border: 2px solid #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; margin-bottom: 5px; }
     .circle.done { background: linear-gradient(135deg,#00e5ff,#8b5cf6); border-color: white; color: white; }
-
     .section-title { font-size: 19px; margin-bottom: 14px; }
-    .task { background: rgba(0,0,0,.24); border-radius: 18px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .task { background: rgba(0,0,0,.24); border-radius: 18px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 10px; align-items: center; transition:.25s; }
     .task.done { border: 1px solid #00e5ff; background: rgba(0,229,255,.12); }
+    .task.flash { transform: scale(1.02); box-shadow: 0 0 28px rgba(0,229,255,.6); }
     .task small { color: #aab6ff; display: block; margin-bottom: 4px; }
-    .task-actions { display: flex; gap: 5px; align-items: center; }
+    .task-actions { display: flex; gap: 5px; align-items: center; flex-wrap:wrap; justify-content:flex-end; }
     .icon-btn { min-width: 42px; padding: 11px; }
     .edit { background: linear-gradient(135deg,#f59e0b,#ec4899); }
     .delete { background: #ef4444; }
-
     button { border: none; border-radius: 14px; padding: 11px 13px; color: white; font-weight: bold; cursor: pointer; background: linear-gradient(135deg,#2563eb,#8b5cf6); }
     input, textarea { width: 100%; padding: 13px; margin-bottom: 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.28); color: white; outline: none; }
     textarea { min-height: 90px; resize: vertical; font-size: 12px; }
-
     .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .days-picker { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
     .days-picker label { background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 10px 6px; font-size: 13px; text-align: center; }
     .days-picker input { width: auto; margin-right: 4px; margin-bottom: 0; }
-
     .add-btn { width: 100%; margin-top: 4px; background: linear-gradient(135deg,#00e5ff,#8b5cf6); }
     .cancel-btn { width: 100%; margin-top: 8px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); }
     .empty { color: #aab6ff; font-size: 14px; text-align: center; padding: 12px; }
     .summary-item, .history-item { background: rgba(0,0,0,.22); border-radius: 16px; padding: 12px; margin-bottom: 8px; }
     .summary-item small, .history-item small { color: #aab6ff; display: block; margin-bottom: 3px; }
     .footer { text-align: center; color: #7f8cff; font-size: 12px; margin-top: 20px; }
+    .settings-row { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .toggle { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.18); }
+    .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(120px); width: min(390px, calc(100% - 28px)); background: linear-gradient(135deg,#111827,#312e81); border:1px solid rgba(255,255,255,.18); border-radius:22px; padding:16px; box-shadow:0 18px 50px rgba(0,0,0,.55); z-index:20; opacity:0; transition:.35s; }
+    .toast.show { opacity:1; transform: translateX(-50%) translateY(0); }
+    .toast strong { display:block; font-size:18px; margin-bottom:4px; }
+    .celebration { position:fixed; inset:0; pointer-events:none; z-index:15; overflow:hidden; }
+    .confetti { position:absolute; width:10px; height:14px; border-radius:3px; animation: fall 1.4s linear forwards; }
+    @keyframes fall { from { transform: translateY(-20px) rotate(0deg); opacity:1; } to { transform: translateY(105vh) rotate(720deg); opacity:0; } }
+    .pulse-screen { position:fixed; inset:0; background: radial-gradient(circle, rgba(0,229,255,.25), rgba(139,92,246,.12), transparent 60%); pointer-events:none; opacity:0; z-index:14; animation:pulse .9s ease-out forwards; }
+    @keyframes pulse { 0%{opacity:0; transform:scale(.85)} 35%{opacity:1} 100%{opacity:0; transform:scale(1.15)} }
+    .weekly-modal { position:fixed; inset:0; background:rgba(0,0,0,.72); display:none; align-items:center; justify-content:center; padding:20px; z-index:30; }
+    .weekly-box { max-width:390px; width:100%; text-align:center; background:linear-gradient(135deg,#111827,#1e1b4b,#312e81); border:1px solid rgba(255,255,255,.18); border-radius:28px; padding:26px; box-shadow:0 25px 70px rgba(0,0,0,.6); }
+    .weekly-box h2 { font-size:30px; margin-bottom:10px; }
+    .weekly-box p { color:#dbe4ff; line-height:1.45; margin-bottom:18px; }
   </style>
 </head>
-
 <body>
+  <div class="celebration" id="celebration"></div>
+  <div id="pulseRoot"></div>
+  <div class="toast" id="toast"><strong id="toastTitle"></strong><span id="toastText"></span></div>
+  <div class="weekly-modal" id="weeklyModal">
+    <div class="weekly-box">
+      <h2>🏆 Semana perfeita!</h2>
+      <p>Persistência vence intensidade. Você construiu essa semana missão por missão.</p>
+      <button onclick="closeWeeklyModal()">Continuar missão</button>
+    </div>
+  </div>
+
   <div class="app">
     <div class="header">
       <div class="logo">⚡ FOM</div>
@@ -69,6 +85,16 @@
     <div class="top-grid">
       <div class="card metric"><p>Progresso hoje</p><h2 id="todayPercent">0%</h2></div>
       <div class="card metric"><p>Ofensiva</p><h2 id="streak">0🔥</h2></div>
+    </div>
+
+    <div class="card">
+      <div class="settings-row">
+        <div>
+          <h3 class="section-title" style="margin-bottom:4px;">Som e efeitos</h3>
+          <p class="subtitle">Toque em concluir para liberar áudio no celular.</p>
+        </div>
+        <button class="toggle" id="soundBtn" onclick="toggleSound()">🔊 ON</button>
+      </div>
     </div>
 
     <div class="card">
@@ -90,22 +116,16 @@
     <div class="card">
       <h3 class="section-title" id="formTitle">Adicionar missão</h3>
       <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
-
       <div class="days-picker">
-        <label><input type="checkbox" value="1">Seg</label>
-        <label><input type="checkbox" value="2">Ter</label>
-        <label><input type="checkbox" value="3">Qua</label>
-        <label><input type="checkbox" value="4">Qui</label>
-        <label><input type="checkbox" value="5">Sex</label>
-        <label><input type="checkbox" value="6">Sáb</label>
+        <label><input type="checkbox" value="1">Seg</label><label><input type="checkbox" value="2">Ter</label>
+        <label><input type="checkbox" value="3">Qua</label><label><input type="checkbox" value="4">Qui</label>
+        <label><input type="checkbox" value="5">Sex</label><label><input type="checkbox" value="6">Sáb</label>
         <label><input type="checkbox" value="0">Dom</label>
       </div>
-
       <div class="time-grid">
         <div><p class="subtitle">Início</p><input type="time" id="taskStart" value="08:00" /></div>
         <div><p class="subtitle">Fim</p><input type="time" id="taskEnd" value="08:30" /></div>
       </div>
-
       <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
       <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
       <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
@@ -135,16 +155,17 @@
 
   <script>
     const days = [
-      { id: 1, name: "SEG", full: "Segunda-feira" },
-      { id: 2, name: "TER", full: "Terça-feira" },
-      { id: 3, name: "QUA", full: "Quarta-feira" },
-      { id: 4, name: "QUI", full: "Quinta-feira" },
-      { id: 5, name: "SEX", full: "Sexta-feira" },
-      { id: 6, name: "SÁB", full: "Sábado" },
+      { id: 1, name: "SEG", full: "Segunda-feira" }, { id: 2, name: "TER", full: "Terça-feira" },
+      { id: 3, name: "QUA", full: "Quarta-feira" }, { id: 4, name: "QUI", full: "Quinta-feira" },
+      { id: 5, name: "SEX", full: "Sexta-feira" }, { id: 6, name: "SÁB", full: "Sábado" },
       { id: 0, name: "DOM", full: "Domingo" }
     ];
 
     let editingTaskId = null;
+    let soundEnabled = JSON.parse(localStorage.getItem("fom_sound") || "true");
+    let lastDailyCelebration = localStorage.getItem("fom_last_daily_celebration") || "";
+    let lastWeeklyCelebration = localStorage.getItem("fom_last_weekly_celebration") || "";
+
     let tasks = JSON.parse(localStorage.getItem("fom_tasks")) || [
       { id: Date.now() + 1, days: [1,2,3,4,5], start: "07:30", end: "08:00", title: "Estudar inglês", doneDates: [] },
       { id: Date.now() + 2, days: [1,3,5], start: "20:00", end: "20:30", title: "Revisar projetos", doneDates: [] }
@@ -160,41 +181,16 @@
 
     save();
 
-    function save() {
-      localStorage.setItem("fom_tasks", JSON.stringify(tasks));
-    }
-
-    function todayKey(offset = 0) {
-      const d = new Date();
-      d.setDate(d.getDate() + offset);
-      return d.toISOString().slice(0, 10);
-    }
-
-    function getDayFromDate(dateKey) {
-      return new Date(dateKey + "T12:00:00").getDay();
-    }
-
-    function todayDay() {
-      return new Date().getDay();
-    }
-
-    function getDayName(dayId) {
-      return days.find(d => d.id === dayId)?.full || "";
-    }
-
-    function getTasksByDate(dateKey) {
-      const day = getDayFromDate(dateKey);
-      return tasks.filter(t => t.days.includes(day)).sort((a,b) => a.start.localeCompare(b.start));
-    }
-
+    function save() { localStorage.setItem("fom_tasks", JSON.stringify(tasks)); }
+    function todayKey(offset = 0) { const d = new Date(); d.setDate(d.getDate() + offset); return d.toISOString().slice(0, 10); }
+    function getDayFromDate(dateKey) { return new Date(dateKey + "T12:00:00").getDay(); }
+    function todayDay() { return new Date().getDay(); }
+    function getDayName(dayId) { return days.find(d => d.id === dayId)?.full || ""; }
+    function getTasksByDate(dateKey) { const day = getDayFromDate(dateKey); return tasks.filter(t => t.days.includes(day)).sort((a,b) => a.start.localeCompare(b.start)); }
     function getProgressByDate(dateKey) {
       const dateTasks = getTasksByDate(dateKey);
       const done = dateTasks.filter(t => t.doneDates.includes(dateKey)).length;
-      return {
-        total: dateTasks.length,
-        done,
-        percent: dateTasks.length ? Math.round((done / dateTasks.length) * 100) : 0
-      };
+      return { total: dateTasks.length, done, percent: dateTasks.length ? Math.round((done / dateTasks.length) * 100) : 0 };
     }
 
     function render() {
@@ -206,6 +202,7 @@
       document.getElementById("progressFill").style.width = progress.percent + "%";
       document.getElementById("todayCount").innerText = `${progress.done} de ${progress.total} missões concluídas`;
       document.getElementById("streak").innerText = calculateStreak() + "🔥";
+      document.getElementById("soundBtn").innerText = soundEnabled ? "🔊 ON" : "🔇 OFF";
 
       const notice = document.getElementById("notice");
       if (progress.percent === 100 && progress.total > 0) notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
@@ -220,27 +217,20 @@
 
     function renderTasks(todayTasks, today) {
       const list = document.getElementById("tasksList");
-      if (!todayTasks.length) {
-        list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`;
-        return;
-      }
+      if (!todayTasks.length) { list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`; return; }
 
       list.innerHTML = todayTasks.map(task => {
         const done = task.doneDates.includes(today);
         const programmedDays = task.days.map(id => days.find(d => d.id === id)?.name).join(", ");
         return `
-          <div class="task ${done ? "done" : ""}">
-            <div>
-              <small>${task.start} - ${task.end} • ${programmedDays}</small>
-              <strong>${task.title}</strong>
-            </div>
+          <div class="task ${done ? "done" : ""}" id="task-${task.id}">
+            <div><small>${task.start} - ${task.end} • ${programmedDays}</small><strong>${task.title}</strong></div>
             <div class="task-actions">
               <button class="icon-btn edit" onclick="editTask(${task.id})">✏️</button>
               <button onclick="toggleDone(${task.id})">${done ? "Feito" : "Concluir"}</button>
               <button class="delete icon-btn" onclick="deleteTask(${task.id})">X</button>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join("");
     }
 
@@ -253,15 +243,7 @@
         if (offset > 0) offset -= 7;
         const date = todayKey(offset);
         const progress = getProgressByDate(date);
-
-        return `
-          <div class="day">
-            <div class="circle ${progress.percent === 100 && progress.total > 0 ? "done" : ""}">
-              ${progress.percent}%
-            </div>
-            ${d.name}
-          </div>
-        `;
+        return `<div class="day"><div class="circle ${progress.percent === 100 && progress.total > 0 ? "done" : ""}">${progress.percent}%</div>${d.name}</div>`;
       }).join("");
     }
 
@@ -269,41 +251,21 @@
       const tomorrowDate = todayKey(1);
       const tomorrowDay = getDayFromDate(tomorrowDate);
       const tomorrowTasks = getTasksByDate(tomorrowDate);
-
       document.getElementById("tomorrowLabel").innerText = `Resumo de ${getDayName(tomorrowDay)}`;
       const list = document.getElementById("tomorrowList");
-
-      if (!tomorrowTasks.length) {
-        list.innerHTML = `<div class="empty">Nenhuma missão programada para o próximo dia.</div>`;
-        return;
-      }
-
-      list.innerHTML = tomorrowTasks.map(task => `
-        <div class="summary-item">
-          <small>${task.start} - ${task.end}</small>
-          <strong>${task.title}</strong>
-        </div>
-      `).join("");
+      if (!tomorrowTasks.length) { list.innerHTML = `<div class="empty">Nenhuma missão programada para o próximo dia.</div>`; return; }
+      list.innerHTML = tomorrowTasks.map(task => `<div class="summary-item"><small>${task.start} - ${task.end}</small><strong>${task.title}</strong></div>`).join("");
     }
 
     function renderHistory() {
       const list = document.getElementById("historyList");
       let html = "";
-
       for (let i = 0; i < 7; i++) {
         const date = todayKey(-i);
         const day = getDayFromDate(date);
         const p = getProgressByDate(date);
-
-        html += `
-          <div class="history-item">
-            <small>${date} • ${getDayName(day)}</small>
-            <strong>${p.percent}%</strong>
-            <span class="subtitle"> • ${p.done} de ${p.total} missões</span>
-          </div>
-        `;
+        html += `<div class="history-item"><small>${date} • ${getDayName(day)}</small><strong>${p.percent}%</strong><span class="subtitle"> • ${p.done} de ${p.total} missões</span></div>`;
       }
-
       list.innerHTML = html;
     }
 
@@ -312,57 +274,34 @@
       const start = document.getElementById("taskStart").value;
       const end = document.getElementById("taskEnd").value;
       const title = document.getElementById("taskTitle").value.trim();
-
       if (!selectedDays.length) return alert("Selecione pelo menos um dia da semana."), null;
       if (!start || !end) return alert("Informe o horário de início e fim."), null;
       if (end <= start) return alert("O horário de fim precisa ser maior que o horário de início."), null;
       if (!title) return alert("Digite o nome da missão."), null;
-
       return { selectedDays, start, end, title };
     }
 
     function saveTaskFromForm() {
       const data = getFormData();
       if (!data) return;
-
       if (editingTaskId) {
-        tasks = tasks.map(task => task.id !== editingTaskId ? task : {
-          ...task,
-          days: data.selectedDays,
-          start: data.start,
-          end: data.end,
-          title: data.title
-        });
+        tasks = tasks.map(task => task.id !== editingTaskId ? task : { ...task, days: data.selectedDays, start: data.start, end: data.end, title: data.title });
         cancelEdit(false);
       } else {
-        tasks.push({
-          id: Date.now(),
-          days: data.selectedDays,
-          start: data.start,
-          end: data.end,
-          title: data.title,
-          doneDates: []
-        });
+        tasks.push({ id: Date.now(), days: data.selectedDays, start: data.start, end: data.end, title: data.title, doneDates: [] });
         clearForm();
       }
-
-      save();
-      render();
+      save(); render();
     }
 
     function editTask(id) {
       const task = tasks.find(t => t.id === id);
       if (!task) return;
-
       editingTaskId = id;
       document.getElementById("formTitle").innerText = "Editar missão";
       document.getElementById("saveTaskBtn").innerText = "Salvar alteração";
       document.getElementById("cancelEditBtn").style.display = "block";
-
-      document.querySelectorAll(".days-picker input").forEach(input => {
-        input.checked = task.days.includes(Number(input.value));
-      });
-
+      document.querySelectorAll(".days-picker input").forEach(input => { input.checked = task.days.includes(Number(input.value)); });
       document.getElementById("taskStart").value = task.start;
       document.getElementById("taskEnd").value = task.end;
       document.getElementById("taskTitle").value = task.title;
@@ -387,80 +326,172 @@
 
     function toggleDone(id) {
       const today = todayKey();
+      const before = getProgressByDate(today);
+      let completedNow = false;
 
       tasks = tasks.map(task => {
         if (task.id !== id) return task;
         const alreadyDone = task.doneDates.includes(today);
-        return {
-          ...task,
-          doneDates: alreadyDone ? task.doneDates.filter(d => d !== today) : [...task.doneDates, today]
-        };
+        completedNow = !alreadyDone;
+        return { ...task, doneDates: alreadyDone ? task.doneDates.filter(d => d !== today) : [...task.doneDates, today] };
       });
 
       save();
       render();
+
+      if (completedNow) {
+        celebrateMission(id);
+        const after = getProgressByDate(today);
+        if (before.percent < 100 && after.percent === 100 && after.total > 0) celebrateDay100(today);
+        checkWeeklyPerfect();
+      }
     }
 
     function deleteTask(id) {
       if (!confirm("Deseja excluir essa missão?")) return;
       tasks = tasks.filter(task => task.id !== id);
       if (editingTaskId === id) cancelEdit(false);
-      save();
-      render();
+      save(); render();
     }
 
     function calculateStreak() {
       let streak = 0;
-
       for (let i = 0; i < 365; i++) {
         const date = todayKey(-i);
         const p = getProgressByDate(date);
-
         if (!p.total) break;
         if (p.percent === 100) streak++;
         else break;
       }
-
       return streak;
     }
 
     function exportData() {
-      const backup = {
-        app: "FOM",
-        version: 2,
-        exportedAt: new Date().toISOString(),
-        tasks
-      };
-
+      const backup = { app: "FOM", version: 3, exportedAt: new Date().toISOString(), tasks };
       document.getElementById("syncBox").value = btoa(unescape(encodeURIComponent(JSON.stringify(backup))));
       alert("Backup gerado. Copie esse texto e cole no celular.");
     }
 
     function importData() {
       const text = document.getElementById("syncBox").value.trim();
-
-      if (!text) {
-        alert("Cole o backup antes de importar.");
-        return;
-      }
-
+      if (!text) { alert("Cole o backup antes de importar."); return; }
       try {
         const backup = JSON.parse(decodeURIComponent(escape(atob(text))));
-
-        if (!backup.tasks || !Array.isArray(backup.tasks)) {
-          alert("Backup inválido.");
-          return;
-        }
-
+        if (!backup.tasks || !Array.isArray(backup.tasks)) { alert("Backup inválido."); return; }
         if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
+        tasks = backup.tasks; save(); render(); alert("Dados importados com sucesso.");
+      } catch (e) { alert("Não foi possível importar. Verifique se copiou o backup completo."); }
+    }
 
-        tasks = backup.tasks;
-        save();
-        render();
-        alert("Dados importados com sucesso.");
-      } catch (e) {
-        alert("Não foi possível importar. Verifique se copiou o backup completo.");
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      localStorage.setItem("fom_sound", JSON.stringify(soundEnabled));
+      render();
+      if (soundEnabled) playTone([520, 680], 0.08, "sine");
+    }
+
+    function playTone(freqs, duration = 0.12, type = "sine") {
+      if (!soundEnabled) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const ctx = new AudioContext();
+        let start = ctx.currentTime;
+        freqs.forEach((freq, i) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, start + i * duration);
+          gain.gain.setValueAtTime(0.0001, start + i * duration);
+          gain.gain.exponentialRampToValueAtTime(0.18, start + i * duration + 0.015);
+          gain.gain.exponentialRampToValueAtTime(0.0001, start + (i + 1) * duration);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(start + i * duration);
+          osc.stop(start + (i + 1) * duration + 0.02);
+        });
+      } catch(e) {}
+    }
+
+    function vibrate(pattern) {
+      if (navigator.vibrate) navigator.vibrate(pattern);
+    }
+
+    function showToast(title, text, ms = 2300) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toastTitle").innerText = title;
+      document.getElementById("toastText").innerText = text;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), ms);
+    }
+
+    function pulseScreen() {
+      const root = document.getElementById("pulseRoot");
+      const div = document.createElement("div");
+      div.className = "pulse-screen";
+      root.appendChild(div);
+      setTimeout(() => div.remove(), 1000);
+    }
+
+    function confetti(amount = 60) {
+      const root = document.getElementById("celebration");
+      const colors = ["#00e5ff", "#8b5cf6", "#ff4ecd", "#22c55e", "#f59e0b", "#ffffff"];
+      for (let i = 0; i < amount; i++) {
+        const piece = document.createElement("div");
+        piece.className = "confetti";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 0.35 + "s";
+        piece.style.animationDuration = (1.1 + Math.random() * 1.2) + "s";
+        root.appendChild(piece);
+        setTimeout(() => piece.remove(), 2600);
       }
+    }
+
+    function celebrateMission(id) {
+      playTone([640, 860], 0.07, "sine");
+      vibrate(35);
+      showToast("Missão concluída ⚡", "Boa. Uma missão a menos entre você e os 100%.");
+      const el = document.getElementById("task-" + id);
+      if (el) {
+        el.classList.add("flash");
+        setTimeout(() => el.classList.remove("flash"), 550);
+      }
+    }
+
+    function celebrateDay100(date) {
+      if (lastDailyCelebration === date) return;
+      lastDailyCelebration = date;
+      localStorage.setItem("fom_last_daily_celebration", date);
+      playTone([523, 659, 784, 1046], 0.11, "triangle");
+      vibrate([80, 40, 120]);
+      pulseScreen();
+      confetti(85);
+      showToast("Dia 100% fechado 🎉", "Ofensiva protegida. Hoje você cumpriu o combinado.", 3200);
+    }
+
+    function isLast7DaysPerfect() {
+      for (let i = 0; i < 7; i++) {
+        const p = getProgressByDate(todayKey(-i));
+        if (!p.total || p.percent !== 100) return false;
+      }
+      return true;
+    }
+
+    function checkWeeklyPerfect() {
+      const today = todayKey();
+      if (!isLast7DaysPerfect()) return;
+      if (lastWeeklyCelebration === today) return;
+      lastWeeklyCelebration = today;
+      localStorage.setItem("fom_last_weekly_celebration", today);
+      playTone([392, 523, 659, 784, 1046], 0.12, "triangle");
+      vibrate([120, 60, 120, 60, 180]);
+      confetti(130);
+      pulseScreen();
+      document.getElementById("weeklyModal").style.display = "flex";
+    }
+
+    function closeWeeklyModal() {
+      document.getElementById("weeklyModal").style.display = "none";
     }
 
     render();
