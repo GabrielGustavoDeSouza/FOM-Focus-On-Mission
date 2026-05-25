@@ -7,186 +7,52 @@
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-
-    body {
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #1d2bff 0%, #09091f 40%, #03030a 100%);
-      color: white;
-      padding: 18px;
-    }
-
+    body { min-height: 100vh; background: radial-gradient(circle at top, #1d2bff 0%, #09091f 40%, #03030a 100%); color: white; padding: 18px; }
     .app { max-width: 430px; margin: 0 auto; padding-bottom: 30px; }
-
     .header { text-align: center; margin-top: 12px; margin-bottom: 24px; }
     .logo { font-size: 42px; font-weight: bold; }
     .subtitle { color: #b8c7ff; font-size: 14px; margin-top: 4px; }
 
-    .card {
-      background: rgba(255, 255, 255, 0.09);
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      border-radius: 24px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
-      backdrop-filter: blur(12px);
-    }
-
+    .card { background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.13); border-radius: 24px; padding: 18px; margin-bottom: 16px; box-shadow: 0 15px 40px rgba(0,0,0,.35); backdrop-filter: blur(12px); }
     .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     .metric h2 { font-size: 34px; margin-top: 6px; }
     .metric p { color: #b8c7ff; font-size: 13px; }
 
-    .progress-bar {
-      width: 100%; height: 14px; background: rgba(255, 255, 255, 0.15);
-      border-radius: 99px; overflow: hidden; margin-top: 12px;
-    }
+    .progress-bar { width: 100%; height: 14px; background: rgba(255,255,255,.15); border-radius: 99px; overflow: hidden; margin-top: 12px; }
+    .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg,#00e5ff,#8b5cf6,#ff4ecd); border-radius: 99px; transition: .4s; }
 
-    .progress-fill {
-      height: 100%; width: 0%;
-      background: linear-gradient(90deg, #00e5ff, #8b5cf6, #ff4ecd);
-      border-radius: 99px; transition: 0.4s;
-    }
+    .notice { background: linear-gradient(135deg,#6d28d9,#2563eb); border-radius: 22px; padding: 16px; margin-bottom: 16px; font-weight: bold; line-height: 1.4; }
 
-    .notice {
-      background: linear-gradient(135deg, #6d28d9, #2563eb);
-      border-radius: 22px; padding: 16px; margin-bottom: 16px;
-      font-weight: bold; line-height: 1.4;
-    }
-
-    .timeline {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 16px; position: relative;
-    }
-
-    .timeline::before {
-      content: ""; position: absolute; top: 21px; left: 20px; right: 20px;
-      height: 4px; background: rgba(255, 255, 255, 0.18);
-      z-index: 0; border-radius: 10px;
-    }
-
+    .timeline { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; position: relative; }
+    .timeline::before { content: ""; position: absolute; top: 21px; left: 20px; right: 20px; height: 4px; background: rgba(255,255,255,.18); z-index: 0; border-radius: 10px; }
     .day { position: relative; z-index: 1; text-align: center; font-size: 11px; color: #cbd5ff; }
-
-    .circle {
-      width: 42px; height: 42px; border-radius: 50%; background: #111827;
-      border: 2px solid #4f46e5; display: flex; align-items: center;
-      justify-content: center; font-size: 11px; font-weight: bold; margin-bottom: 5px;
-    }
-
-    .circle.done {
-      background: linear-gradient(135deg, #00e5ff, #8b5cf6);
-      border-color: white; color: white;
-    }
+    .circle { width: 42px; height: 42px; border-radius: 50%; background: #111827; border: 2px solid #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; margin-bottom: 5px; }
+    .circle.done { background: linear-gradient(135deg,#00e5ff,#8b5cf6); border-color: white; color: white; }
 
     .section-title { font-size: 19px; margin-bottom: 14px; }
-
-    .task {
-      background: rgba(0, 0, 0, 0.24);
-      border-radius: 18px; padding: 14px; margin-bottom: 10px;
-      display: flex; justify-content: space-between; gap: 10px; align-items: center;
-    }
-
-    .task.done {
-      border: 1px solid #00e5ff;
-      background: rgba(0, 229, 255, 0.12);
-    }
-
+    .task { background: rgba(0,0,0,.24); border-radius: 18px; padding: 14px; margin-bottom: 10px; display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .task.done { border: 1px solid #00e5ff; background: rgba(0,229,255,.12); }
     .task small { color: #aab6ff; display: block; margin-bottom: 4px; }
-
-    .task-actions {
-      display: flex;
-      gap: 5px;
-      align-items: center;
-    }
-
-    .icon-btn {
-      min-width: 42px;
-      padding: 11px;
-    }
-
-    .edit {
-      background: linear-gradient(135deg, #f59e0b, #ec4899);
-    }
-
-    button {
-      border: none; border-radius: 14px; padding: 11px 13px;
-      color: white; font-weight: bold; cursor: pointer;
-      background: linear-gradient(135deg, #2563eb, #8b5cf6);
-    }
-
+    .task-actions { display: flex; gap: 5px; align-items: center; }
+    .icon-btn { min-width: 42px; padding: 11px; }
+    .edit { background: linear-gradient(135deg,#f59e0b,#ec4899); }
     .delete { background: #ef4444; }
 
-    input {
-      width: 100%; padding: 13px; margin-bottom: 10px; border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.18);
-      background: rgba(0,0,0,0.28); color: white; outline: none;
-    }
+    button { border: none; border-radius: 14px; padding: 11px 13px; color: white; font-weight: bold; cursor: pointer; background: linear-gradient(135deg,#2563eb,#8b5cf6); }
+    input, textarea { width: 100%; padding: 13px; margin-bottom: 10px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: rgba(0,0,0,.28); color: white; outline: none; }
+    textarea { min-height: 90px; resize: vertical; font-size: 12px; }
 
-    .time-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .days-picker { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 12px; }
+    .days-picker label { background: rgba(0,0,0,.28); border: 1px solid rgba(255,255,255,.18); border-radius: 14px; padding: 10px 6px; font-size: 13px; text-align: center; }
+    .days-picker input { width: auto; margin-right: 4px; margin-bottom: 0; }
 
-    .days-picker {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-      margin-bottom: 12px;
-    }
-
-    .days-picker label {
-      background: rgba(0,0,0,0.28);
-      border: 1px solid rgba(255,255,255,0.18);
-      border-radius: 14px;
-      padding: 10px 6px;
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .days-picker input {
-      width: auto;
-      margin-right: 4px;
-      margin-bottom: 0;
-    }
-
-    .add-btn {
-      width: 100%;
-      margin-top: 4px;
-      background: linear-gradient(135deg, #00e5ff, #8b5cf6);
-    }
-
-    .cancel-btn {
-      width: 100%;
-      margin-top: 8px;
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    .empty {
-      color: #aab6ff;
-      font-size: 14px;
-      text-align: center;
-      padding: 12px;
-    }
-
-    .summary-item {
-      background: rgba(0, 0, 0, 0.22);
-      border-radius: 16px;
-      padding: 12px;
-      margin-bottom: 8px;
-    }
-
-    .summary-item small {
-      color: #aab6ff;
-      display: block;
-      margin-bottom: 3px;
-    }
-
-    .footer {
-      text-align: center;
-      color: #7f8cff;
-      font-size: 12px;
-      margin-top: 20px;
-    }
+    .add-btn { width: 100%; margin-top: 4px; background: linear-gradient(135deg,#00e5ff,#8b5cf6); }
+    .cancel-btn { width: 100%; margin-top: 8px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.2); }
+    .empty { color: #aab6ff; font-size: 14px; text-align: center; padding: 12px; }
+    .summary-item, .history-item { background: rgba(0,0,0,.22); border-radius: 16px; padding: 12px; margin-bottom: 8px; }
+    .summary-item small, .history-item small { color: #aab6ff; display: block; margin-bottom: 3px; }
+    .footer { text-align: center; color: #7f8cff; font-size: 12px; margin-top: 20px; }
   </style>
 </head>
 
@@ -198,27 +64,16 @@
       <div class="subtitle">Sua disciplina em modo missão</div>
     </div>
 
-    <div class="notice" id="notice">
-      Sua ofensiva depende da próxima missão. Não quebra a sequência.
-    </div>
+    <div class="notice" id="notice">Sua ofensiva depende da próxima missão. Não quebra a sequência.</div>
 
     <div class="top-grid">
-      <div class="card metric">
-        <p>Progresso hoje</p>
-        <h2 id="todayPercent">0%</h2>
-      </div>
-
-      <div class="card metric">
-        <p>Ofensiva</p>
-        <h2 id="streak">0🔥</h2>
-      </div>
+      <div class="card metric"><p>Progresso hoje</p><h2 id="todayPercent">0%</h2></div>
+      <div class="card metric"><p>Ofensiva</p><h2 id="streak">0🔥</h2></div>
     </div>
 
     <div class="card">
       <h3 class="section-title">Barra do dia</h3>
-      <div class="progress-bar">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
       <p class="subtitle" id="todayCount" style="margin-top:10px;">0 de 0 missões concluídas</p>
     </div>
 
@@ -234,7 +89,6 @@
 
     <div class="card">
       <h3 class="section-title" id="formTitle">Adicionar missão</h3>
-
       <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
 
       <div class="days-picker">
@@ -248,19 +102,11 @@
       </div>
 
       <div class="time-grid">
-        <div>
-          <p class="subtitle">Início</p>
-          <input type="time" id="taskStart" value="08:00" />
-        </div>
-
-        <div>
-          <p class="subtitle">Fim</p>
-          <input type="time" id="taskEnd" value="08:30" />
-        </div>
+        <div><p class="subtitle">Início</p><input type="time" id="taskStart" value="08:00" /></div>
+        <div><p class="subtitle">Fim</p><input type="time" id="taskEnd" value="08:30" /></div>
       </div>
 
       <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
-
       <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
       <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
     </div>
@@ -271,9 +117,20 @@
       <div id="tomorrowList"></div>
     </div>
 
-    <div class="footer">
-      FOM App • Focus On Mission • by Gabriel
+    <div class="card">
+      <h3 class="section-title">Memória dos últimos dias</h3>
+      <div id="historyList"></div>
     </div>
+
+    <div class="card">
+      <h3 class="section-title">Backup / Sincronizar celular</h3>
+      <p class="subtitle" style="margin-bottom:10px;">Use isso para passar dados do PC para o celular.</p>
+      <button class="add-btn" onclick="exportData()">Exportar dados</button>
+      <textarea id="syncBox" placeholder="Aqui aparece o backup. No outro aparelho, cole aqui e clique em Importar."></textarea>
+      <button class="add-btn" onclick="importData()">Importar dados</button>
+    </div>
+
+    <div class="footer">FOM App • Focus On Mission • by Gabriel</div>
   </div>
 
   <script>
@@ -288,7 +145,6 @@
     ];
 
     let editingTaskId = null;
-
     let tasks = JSON.parse(localStorage.getItem("fom_tasks")) || [
       { id: Date.now() + 1, days: [1,2,3,4,5], start: "07:30", end: "08:00", title: "Estudar inglês", doneDates: [] },
       { id: Date.now() + 2, days: [1,3,5], start: "20:00", end: "20:30", title: "Revisar projetos", doneDates: [] }
@@ -298,6 +154,7 @@
       if (!task.days && task.day !== undefined) task.days = [Number(task.day)];
       if (!task.start && task.time) task.start = task.time;
       if (!task.end) task.end = task.start || "08:30";
+      if (!task.doneDates) task.doneDates = [];
       return task;
     });
 
@@ -322,44 +179,47 @@
     }
 
     function getDayName(dayId) {
-      const found = days.find(d => d.id === dayId);
-      return found ? found.full : "";
+      return days.find(d => d.id === dayId)?.full || "";
+    }
+
+    function getTasksByDate(dateKey) {
+      const day = getDayFromDate(dateKey);
+      return tasks.filter(t => t.days.includes(day)).sort((a,b) => a.start.localeCompare(b.start));
+    }
+
+    function getProgressByDate(dateKey) {
+      const dateTasks = getTasksByDate(dateKey);
+      const done = dateTasks.filter(t => t.doneDates.includes(dateKey)).length;
+      return {
+        total: dateTasks.length,
+        done,
+        percent: dateTasks.length ? Math.round((done / dateTasks.length) * 100) : 0
+      };
     }
 
     function render() {
       const today = todayKey();
-      const day = todayDay();
+      const todayTasks = getTasksByDate(today);
+      const progress = getProgressByDate(today);
 
-      const todayTasks = tasks
-        .filter(t => t.days.includes(day))
-        .sort((a, b) => a.start.localeCompare(b.start));
-
-      const doneToday = todayTasks.filter(t => t.doneDates.includes(today)).length;
-      const percent = todayTasks.length ? Math.round((doneToday / todayTasks.length) * 100) : 0;
-
-      document.getElementById("todayPercent").innerText = percent + "%";
-      document.getElementById("progressFill").style.width = percent + "%";
-      document.getElementById("todayCount").innerText = `${doneToday} de ${todayTasks.length} missões concluídas`;
+      document.getElementById("todayPercent").innerText = progress.percent + "%";
+      document.getElementById("progressFill").style.width = progress.percent + "%";
+      document.getElementById("todayCount").innerText = `${progress.done} de ${progress.total} missões concluídas`;
       document.getElementById("streak").innerText = calculateStreak() + "🔥";
 
       const notice = document.getElementById("notice");
-
-      if (percent === 100 && todayTasks.length > 0) {
-        notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
-      } else if (todayTasks.length === 0) {
-        notice.innerText = "Hoje ainda não tem missão cadastrada. Crie uma missão para começar sua ofensiva.";
-      } else {
-        notice.innerText = `Faltam ${todayTasks.length - doneToday} missão(ões) para fechar 100% hoje.`;
-      }
+      if (progress.percent === 100 && progress.total > 0) notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
+      else if (progress.total === 0) notice.innerText = "Hoje ainda não tem missão cadastrada. Crie uma missão para começar sua ofensiva.";
+      else notice.innerText = `Faltam ${progress.total - progress.done} missão(ões) para fechar 100% hoje.`;
 
       renderTasks(todayTasks, today);
       renderTimeline();
       renderTomorrow();
+      renderHistory();
     }
 
     function renderTasks(todayTasks, today) {
       const list = document.getElementById("tasksList");
-
       if (!todayTasks.length) {
         list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`;
         return;
@@ -367,10 +227,7 @@
 
       list.innerHTML = todayTasks.map(task => {
         const done = task.doneDates.includes(today);
-        const programmedDays = task.days
-          .map(id => days.find(d => d.id === id)?.name)
-          .join(", ");
-
+        const programmedDays = task.days.map(id => days.find(d => d.id === id)?.name).join(", ");
         return `
           <div class="task ${done ? "done" : ""}">
             <div>
@@ -392,20 +249,15 @@
       const currentDay = todayDay();
 
       timeline.innerHTML = days.map(d => {
-        const dayTasks = tasks.filter(t => t.days.includes(d.id));
-
         let offset = d.id - currentDay;
         if (offset > 0) offset -= 7;
-
         const date = todayKey(offset);
-        const total = dayTasks.length;
-        const done = dayTasks.filter(t => t.doneDates.includes(date)).length;
-        const percent = total ? Math.round((done / total) * 100) : 0;
+        const progress = getProgressByDate(date);
 
         return `
           <div class="day">
-            <div class="circle ${percent === 100 && total > 0 ? "done" : ""}">
-              ${percent}%
+            <div class="circle ${progress.percent === 100 && progress.total > 0 ? "done" : ""}">
+              ${progress.percent}%
             </div>
             ${d.name}
           </div>
@@ -416,14 +268,9 @@
     function renderTomorrow() {
       const tomorrowDate = todayKey(1);
       const tomorrowDay = getDayFromDate(tomorrowDate);
+      const tomorrowTasks = getTasksByDate(tomorrowDate);
 
-      const tomorrowTasks = tasks
-        .filter(t => t.days.includes(tomorrowDay))
-        .sort((a, b) => a.start.localeCompare(b.start));
-
-      document.getElementById("tomorrowLabel").innerText =
-        `Resumo de ${getDayName(tomorrowDay)}`;
-
+      document.getElementById("tomorrowLabel").innerText = `Resumo de ${getDayName(tomorrowDay)}`;
       const list = document.getElementById("tomorrowList");
 
       if (!tomorrowTasks.length) {
@@ -439,33 +286,37 @@
       `).join("");
     }
 
-    function getFormData() {
-      const selectedDays = Array.from(document.querySelectorAll(".days-picker input:checked"))
-        .map(input => Number(input.value));
+    function renderHistory() {
+      const list = document.getElementById("historyList");
+      let html = "";
 
+      for (let i = 0; i < 7; i++) {
+        const date = todayKey(-i);
+        const day = getDayFromDate(date);
+        const p = getProgressByDate(date);
+
+        html += `
+          <div class="history-item">
+            <small>${date} • ${getDayName(day)}</small>
+            <strong>${p.percent}%</strong>
+            <span class="subtitle"> • ${p.done} de ${p.total} missões</span>
+          </div>
+        `;
+      }
+
+      list.innerHTML = html;
+    }
+
+    function getFormData() {
+      const selectedDays = Array.from(document.querySelectorAll(".days-picker input:checked")).map(input => Number(input.value));
       const start = document.getElementById("taskStart").value;
       const end = document.getElementById("taskEnd").value;
       const title = document.getElementById("taskTitle").value.trim();
 
-      if (!selectedDays.length) {
-        alert("Selecione pelo menos um dia da semana.");
-        return null;
-      }
-
-      if (!start || !end) {
-        alert("Informe o horário de início e fim.");
-        return null;
-      }
-
-      if (end <= start) {
-        alert("O horário de fim precisa ser maior que o horário de início.");
-        return null;
-      }
-
-      if (!title) {
-        alert("Digite o nome da missão.");
-        return null;
-      }
+      if (!selectedDays.length) return alert("Selecione pelo menos um dia da semana."), null;
+      if (!start || !end) return alert("Informe o horário de início e fim."), null;
+      if (end <= start) return alert("O horário de fim precisa ser maior que o horário de início."), null;
+      if (!title) return alert("Digite o nome da missão."), null;
 
       return { selectedDays, start, end, title };
     }
@@ -475,18 +326,13 @@
       if (!data) return;
 
       if (editingTaskId) {
-        tasks = tasks.map(task => {
-          if (task.id !== editingTaskId) return task;
-
-          return {
-            ...task,
-            days: data.selectedDays,
-            start: data.start,
-            end: data.end,
-            title: data.title
-          };
+        tasks = tasks.map(task => task.id !== editingTaskId ? task : {
+          ...task,
+          days: data.selectedDays,
+          start: data.start,
+          end: data.end,
+          title: data.title
         });
-
         cancelEdit(false);
       } else {
         tasks.push({
@@ -497,7 +343,6 @@
           title: data.title,
           doneDates: []
         });
-
         clearForm();
       }
 
@@ -510,7 +355,6 @@
       if (!task) return;
 
       editingTaskId = id;
-
       document.getElementById("formTitle").innerText = "Editar missão";
       document.getElementById("saveTaskBtn").innerText = "Salvar alteração";
       document.getElementById("cancelEditBtn").style.display = "block";
@@ -522,19 +366,15 @@
       document.getElementById("taskStart").value = task.start;
       document.getElementById("taskEnd").value = task.end;
       document.getElementById("taskTitle").value = task.title;
-
       document.getElementById("formTitle").scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function cancelEdit(shouldRender = true) {
       editingTaskId = null;
-
       document.getElementById("formTitle").innerText = "Adicionar missão";
       document.getElementById("saveTaskBtn").innerText = "Adicionar missão";
       document.getElementById("cancelEditBtn").style.display = "none";
-
       clearForm();
-
       if (shouldRender) render();
     }
 
@@ -550,14 +390,10 @@
 
       tasks = tasks.map(task => {
         if (task.id !== id) return task;
-
         const alreadyDone = task.doneDates.includes(today);
-
         return {
           ...task,
-          doneDates: alreadyDone
-            ? task.doneDates.filter(d => d !== today)
-            : [...task.doneDates, today]
+          doneDates: alreadyDone ? task.doneDates.filter(d => d !== today) : [...task.doneDates, today]
         };
       });
 
@@ -568,9 +404,7 @@
     function deleteTask(id) {
       if (!confirm("Deseja excluir essa missão?")) return;
       tasks = tasks.filter(task => task.id !== id);
-
       if (editingTaskId === id) cancelEdit(false);
-
       save();
       render();
     }
@@ -580,18 +414,53 @@
 
       for (let i = 0; i < 365; i++) {
         const date = todayKey(-i);
-        const day = getDayFromDate(date);
-        const dayTasks = tasks.filter(t => t.days.includes(day));
+        const p = getProgressByDate(date);
 
-        if (!dayTasks.length) break;
-
-        const completed = dayTasks.every(t => t.doneDates.includes(date));
-
-        if (completed) streak++;
+        if (!p.total) break;
+        if (p.percent === 100) streak++;
         else break;
       }
 
       return streak;
+    }
+
+    function exportData() {
+      const backup = {
+        app: "FOM",
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        tasks
+      };
+
+      document.getElementById("syncBox").value = btoa(unescape(encodeURIComponent(JSON.stringify(backup))));
+      alert("Backup gerado. Copie esse texto e cole no celular.");
+    }
+
+    function importData() {
+      const text = document.getElementById("syncBox").value.trim();
+
+      if (!text) {
+        alert("Cole o backup antes de importar.");
+        return;
+      }
+
+      try {
+        const backup = JSON.parse(decodeURIComponent(escape(atob(text))));
+
+        if (!backup.tasks || !Array.isArray(backup.tasks)) {
+          alert("Backup inválido.");
+          return;
+        }
+
+        if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
+
+        tasks = backup.tasks;
+        save();
+        render();
+        alert("Dados importados com sucesso.");
+      } catch (e) {
+        alert("Não foi possível importar. Verifique se copiou o backup completo.");
+      }
     }
 
     render();
