@@ -136,6 +136,9 @@
       background: rgba(34,197,94,.10);
     }
 
+    .task.scheduled { border-left: 4px solid var(--pink); }
+    .task.routine { border-left: 4px solid var(--blue); }
+
     .task.late {
       border-color: rgba(245,158,11,.95);
       box-shadow: 0 0 0 1px rgba(245,158,11,.15);
@@ -224,7 +227,7 @@
     .edit { background: linear-gradient(135deg,#f59e0b,#ec4899); }
     .delete { background: var(--red); }
 
-    input, textarea {
+    input, textarea, select {
       width: 100%;
       padding: 13px;
       margin-bottom: 10px;
@@ -237,14 +240,15 @@
     }
 
     textarea { min-height: 88px; resize: vertical; font-size: 12px; }
+    select option { color: #111; }
 
-    input[type="time"] {
+    input[type="time"], input[type="date"] {
       min-height: 52px;
       appearance: none;
       -webkit-appearance: none;
     }
 
-    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .time-grid, .date-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .days-picker {
       display: grid;
@@ -267,6 +271,47 @@
     }
 
     .days-picker input { width: auto; margin: 0; accent-color: var(--blue); }
+
+    .type-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .type-tab {
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.16);
+      color: white;
+      padding: 12px 10px;
+      border-radius: 16px;
+      text-align: center;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .type-tab.active {
+      background: linear-gradient(135deg,var(--blue),var(--purple));
+      border-color: rgba(255,255,255,.35);
+    }
+
+    .form-block { display: none; }
+    .form-block.active { display: block; }
+
+    .toggle-label {
+      background: rgba(0,0,0,.28);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 14px;
+      padding: 10px 6px;
+      font-size: 13px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+    .toggle-label input { width:auto; margin:0; accent-color: var(--blue); }
 
     .add-btn {
       width: 100%;
@@ -398,7 +443,7 @@
     <div class="header">
       <div class="logo">⚡ FOM</div>
       <div class="subtitle">Focus On Mission</div>
-      <div class="subtitle">Sua disciplina em modo missão</div>
+      <div class="subtitle">Rotina + agenda em modo missão</div>
     </div>
 
     <div class="card compact-card">
@@ -427,7 +472,7 @@
       <div class="section-body">
         <div class="quick-row">
           <button onclick="scrollToNextMission()">Próxima missão</button>
-          <button onclick="document.getElementById('formCard').classList.remove('collapsed'); document.getElementById('formTitle').scrollIntoView({behavior:'smooth'});">Nova missão</button>
+          <button onclick="openNewTaskForm()">Nova missão</button>
         </div>
         <div id="pendingTasksList"></div>
       </div>
@@ -440,16 +485,28 @@
       </div>
 
       <div class="section-body">
-        <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
+        <div class="type-tabs">
+          <div class="type-tab active" id="tabRoutine" onclick="setFormType('routine')">Rotina cíclica</div>
+          <div class="type-tab" id="tabScheduled" onclick="setFormType('scheduled')">Agendada</div>
+        </div>
 
-        <div class="days-picker">
-          <label><input type="checkbox" value="1">Seg</label>
-          <label><input type="checkbox" value="2">Ter</label>
-          <label><input type="checkbox" value="3">Qua</label>
-          <label><input type="checkbox" value="4">Qui</label>
-          <label><input type="checkbox" value="5">Sex</label>
-          <label><input type="checkbox" value="6">Sáb</label>
-          <label><input type="checkbox" value="0">Dom</label>
+        <div id="routineBlock" class="form-block active">
+          <p class="subtitle" style="margin-bottom:8px;">Escolha os dias da semana:</p>
+          <div class="days-picker">
+            <label><input type="checkbox" value="1">Seg</label>
+            <label><input type="checkbox" value="2">Ter</label>
+            <label><input type="checkbox" value="3">Qua</label>
+            <label><input type="checkbox" value="4">Qui</label>
+            <label><input type="checkbox" value="5">Sex</label>
+            <label><input type="checkbox" value="6">Sáb</label>
+            <label><input type="checkbox" value="0">Dom</label>
+          </div>
+        </div>
+
+        <div id="scheduledBlock" class="form-block">
+          <p class="subtitle" style="margin-bottom:8px;">Escolha a data da missão:</p>
+          <input type="date" id="taskDate" />
+          <label class="toggle-label"><input type="checkbox" id="taskYearly"> Repetir todo ano nesta data</label>
         </div>
 
         <div class="time-grid">
@@ -457,7 +514,7 @@
           <div><p class="subtitle">Fim</p><input type="time" id="taskEnd" value="08:30" /></div>
         </div>
 
-        <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
+        <input type="text" id="taskTitle" placeholder="Ex: Consulta, aniversário, estudar inglês" />
         <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
         <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
       </div>
@@ -470,6 +527,16 @@
       </div>
       <div class="section-body">
         <div id="doneTasksList"></div>
+      </div>
+    </div>
+
+    <div class="card collapsed" id="scheduledCard">
+      <div class="section-header" onclick="toggleCollapse('scheduledCard')">
+        <h3 class="section-title">Próximas agendadas <span class="badge" id="scheduledBadge">0</span></h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body">
+        <div id="upcomingScheduledList"></div>
       </div>
     </div>
 
@@ -522,25 +589,31 @@
     ];
 
     let editingTaskId = null;
+    let formType = "routine";
     let soundEnabled = JSON.parse(localStorage.getItem("fom_sound_enabled")) || false;
     let lastCelebratedDay = localStorage.getItem("fom_last_day_celebrated") || "";
     let lastCelebratedWeek = localStorage.getItem("fom_last_week_celebrated") || "";
 
     let tasks = JSON.parse(localStorage.getItem("fom_tasks")) || [
-      { id: Date.now() + 1, days: [1,2,3,4,5], start: "07:30", end: "08:00", title: "Estudar inglês", doneDates: [] },
-      { id: Date.now() + 2, days: [1,3,5], start: "20:00", end: "20:30", title: "Revisar projetos", doneDates: [] }
+      { id: Date.now() + 1, type: "routine", days: [1,2,3,4,5], start: "07:30", end: "08:00", title: "Estudar inglês", doneDates: [] },
+      { id: Date.now() + 2, type: "routine", days: [1,3,5], start: "20:00", end: "20:30", title: "Revisar projetos", doneDates: [] }
     ];
 
     tasks = tasks.map(task => {
+      if (!task.type) task.type = "routine";
       if (!task.days && task.day !== undefined) task.days = [Number(task.day)];
+      if (!task.days && task.type === "routine") task.days = [];
       if (!task.start && task.time) task.start = task.time;
       if (!task.end) task.end = task.start || "08:30";
       if (!task.doneDates) task.doneDates = [];
+      if (task.type === "scheduled" && !task.date) task.date = todayKey();
+      if (task.type === "scheduled" && task.yearly === undefined) task.yearly = false;
       return task;
     });
 
     save();
     updateSoundIcon();
+    setDefaultDate();
 
     function save() {
       localStorage.setItem("fom_tasks", JSON.stringify(tasks));
@@ -564,9 +637,21 @@
       return days.find(d => d.id === dayId)?.full || "";
     }
 
-    function getTasksByDate(dateKey) {
+    function getMonthDay(dateKey) {
+      return dateKey.slice(5, 10);
+    }
+
+    function isTaskOnDate(task, dateKey) {
+      if (task.type === "scheduled") {
+        if (task.yearly) return getMonthDay(task.date) === getMonthDay(dateKey);
+        return task.date === dateKey;
+      }
       const day = getDayFromDate(dateKey);
-      return tasks.filter(t => t.days.includes(day)).sort((a,b) => a.start.localeCompare(b.start));
+      return (task.days || []).includes(day);
+    }
+
+    function getTasksByDate(dateKey) {
+      return tasks.filter(t => isTaskOnDate(t, dateKey)).sort((a,b) => a.start.localeCompare(b.start));
     }
 
     function getProgressByDate(dateKey) {
@@ -599,6 +684,7 @@
       renderTimeline();
       renderTomorrow();
       renderHistory();
+      renderUpcomingScheduled();
     }
 
     function renderNotice(progress) {
@@ -637,6 +723,18 @@
       return "";
     }
 
+    function getTaskKindLabel(task) {
+      if (task.type === "scheduled") return task.yearly ? "Agendada anual" : "Agendada única";
+      return "Rotina cíclica";
+    }
+
+    function getTaskDateDetail(task) {
+      if (task.type === "scheduled") {
+        return task.yearly ? `Todo ano em ${task.date.slice(8,10)}/${task.date.slice(5,7)}` : `Data: ${formatDateBR(task.date)}`;
+      }
+      return `Dias: ${(task.days || []).map(id => days.find(d => d.id === id)?.name).join(", ")}`;
+    }
+
     function renderTaskList(elementId, listTasks, today, isDoneGroup) {
       const list = document.getElementById(elementId);
 
@@ -647,15 +745,15 @@
 
       list.innerHTML = listTasks.map(task => {
         const done = task.doneDates.includes(today);
-        const programmedDays = task.days.map(id => days.find(d => d.id === id)?.name).join(", ");
         const status = getTaskStatus(task, today);
         const statusLabel = status === "late" ? " • atrasada" : status === "next" ? " • agora" : "";
+        const icon = task.type === "scheduled" ? "📅" : "🔁";
 
         return `
-          <div class="task ${done ? "done" : ""} ${status}" id="task-${task.id}">
+          <div class="task ${task.type} ${done ? "done" : ""} ${status}" id="task-${task.id}">
             <div class="task-row">
               <div class="task-main" onclick="toggleTaskDetails(${task.id})">
-                <span class="task-time">${task.start} - ${task.end}${statusLabel}</span>
+                <span class="task-time">${icon} ${task.start} - ${task.end}${statusLabel}</span>
                 <div class="task-title">${task.title}</div>
               </div>
               <button class="complete-mini ${done ? "done" : ""}" onclick="toggleDone(${task.id})">${done ? "Reabrir" : "Concluir"}</button>
@@ -663,7 +761,8 @@
 
             <div class="task-details">
               <div class="detail-line">
-                <strong>Programação:</strong> ${programmedDays}<br>
+                <strong>Tipo:</strong> ${getTaskKindLabel(task)}<br>
+                <strong>${getTaskDateDetail(task)}</strong><br>
                 <strong>Horário:</strong> ${task.start} até ${task.end}
               </div>
               <div class="task-actions">
@@ -717,7 +816,7 @@
 
       list.innerHTML = tomorrowTasks.map(task => `
         <div class="summary-item">
-          <small>${task.start} - ${task.end}</small>
+          <small>${task.type === "scheduled" ? "📅" : "🔁"} ${task.start} - ${task.end}</small>
           <strong>${task.title}</strong>
         </div>
       `).join("");
@@ -744,18 +843,74 @@
       list.innerHTML = html;
     }
 
+    function renderUpcomingScheduled() {
+      const list = document.getElementById("upcomingScheduledList");
+      const today = todayKey();
+      const upcoming = [];
+
+      tasks.filter(t => t.type === "scheduled").forEach(task => {
+        let date = task.date;
+        if (task.yearly) {
+          const currentYear = new Date().getFullYear();
+          date = `${currentYear}-${task.date.slice(5,10)}`;
+          if (date < today) date = `${currentYear + 1}-${task.date.slice(5,10)}`;
+        }
+        if (date >= today) upcoming.push({ ...task, nextDate: date });
+      });
+
+      upcoming.sort((a,b) => (a.nextDate + a.start).localeCompare(b.nextDate + b.start));
+      document.getElementById("scheduledBadge").innerText = upcoming.length;
+
+      if (!upcoming.length) {
+        list.innerHTML = `<div class="empty">Nenhuma missão agendada futura.</div>`;
+        return;
+      }
+
+      list.innerHTML = upcoming.slice(0, 12).map(task => `
+        <div class="summary-item">
+          <small>📅 ${formatDateBR(task.nextDate)} • ${task.start} - ${task.end}${task.yearly ? " • anual" : ""}</small>
+          <strong>${task.title}</strong>
+        </div>
+      `).join("");
+    }
+
+    function setFormType(type) {
+      formType = type;
+      document.getElementById("tabRoutine").classList.toggle("active", type === "routine");
+      document.getElementById("tabScheduled").classList.toggle("active", type === "scheduled");
+      document.getElementById("routineBlock").classList.toggle("active", type === "routine");
+      document.getElementById("scheduledBlock").classList.toggle("active", type === "scheduled");
+    }
+
+    function setDefaultDate() {
+      const input = document.getElementById("taskDate");
+      if (input && !input.value) input.value = todayKey();
+    }
+
+    function openNewTaskForm() {
+      document.getElementById("formCard").classList.remove("collapsed");
+      document.getElementById("formTitle").scrollIntoView({ behavior: "smooth" });
+    }
+
     function getFormData() {
-      const selectedDays = Array.from(document.querySelectorAll(".days-picker input:checked")).map(input => Number(input.value));
       const start = document.getElementById("taskStart").value;
       const end = document.getElementById("taskEnd").value;
       const title = document.getElementById("taskTitle").value.trim();
 
-      if (!selectedDays.length) return showToast("Selecione pelo menos um dia da semana."), null;
       if (!start || !end) return showToast("Informe início e fim."), null;
       if (end <= start) return showToast("O fim precisa ser maior que o início."), null;
       if (!title) return showToast("Digite o nome da missão."), null;
 
-      return { selectedDays, start, end, title };
+      if (formType === "routine") {
+        const selectedDays = Array.from(document.querySelectorAll(".days-picker input:checked")).map(input => Number(input.value));
+        if (!selectedDays.length) return showToast("Selecione pelo menos um dia da semana."), null;
+        return { type: "routine", days: selectedDays, start, end, title };
+      }
+
+      const date = document.getElementById("taskDate").value;
+      const yearly = document.getElementById("taskYearly").checked;
+      if (!date) return showToast("Escolha uma data para a missão agendada."), null;
+      return { type: "scheduled", date, yearly, start, end, title };
     }
 
     function saveTaskFromForm() {
@@ -763,28 +918,25 @@
       const data = getFormData();
       if (!data) return;
 
+      const normalized = {
+        type: data.type,
+        days: data.type === "routine" ? data.days : [],
+        date: data.type === "scheduled" ? data.date : undefined,
+        yearly: data.type === "scheduled" ? data.yearly : false,
+        start: data.start,
+        end: data.end,
+        title: data.title
+      };
+
       if (editingTaskId) {
-        tasks = tasks.map(task => task.id !== editingTaskId ? task : {
-          ...task,
-          days: data.selectedDays,
-          start: data.start,
-          end: data.end,
-          title: data.title
-        });
+        tasks = tasks.map(task => task.id !== editingTaskId ? task : { ...task, ...normalized });
         cancelEdit(false);
         showToast("Missão editada com sucesso.");
         playMissionSound();
       } else {
-        tasks.push({
-          id: Date.now(),
-          days: data.selectedDays,
-          start: data.start,
-          end: data.end,
-          title: data.title,
-          doneDates: []
-        });
+        tasks.push({ id: Date.now(), ...normalized, doneDates: [] });
         clearForm();
-        showToast("Missão adicionada com sucesso.");
+        showToast(data.type === "scheduled" ? "Missão agendada com sucesso." : "Missão de rotina adicionada.");
         playMissionSound();
       }
 
@@ -802,10 +954,14 @@
       document.getElementById("saveTaskBtn").innerText = "Salvar alteração";
       document.getElementById("cancelEditBtn").style.display = "block";
 
+      setFormType(task.type || "routine");
+
       document.querySelectorAll(".days-picker input").forEach(input => {
-        input.checked = task.days.includes(Number(input.value));
+        input.checked = (task.days || []).includes(Number(input.value));
       });
 
+      document.getElementById("taskDate").value = task.date || todayKey();
+      document.getElementById("taskYearly").checked = !!task.yearly;
       document.getElementById("taskStart").value = task.start;
       document.getElementById("taskEnd").value = task.end;
       document.getElementById("taskTitle").value = task.title;
@@ -825,7 +981,10 @@
       document.getElementById("taskTitle").value = "";
       document.getElementById("taskStart").value = "08:00";
       document.getElementById("taskEnd").value = "08:30";
+      document.getElementById("taskDate").value = todayKey();
+      document.getElementById("taskYearly").checked = false;
       document.querySelectorAll(".days-picker input").forEach(input => input.checked = false);
+      setFormType("routine");
     }
 
     function toggleDone(id) {
@@ -1044,10 +1203,15 @@
       document.getElementById(id).classList.toggle("collapsed");
     }
 
+    function formatDateBR(dateKey) {
+      const [y,m,d] = dateKey.split("-");
+      return `${d}/${m}/${y}`;
+    }
+
     function exportData() {
       const backup = {
         app: "FOM",
-        version: 4,
+        version: 5,
         exportedAt: new Date().toISOString(),
         tasks,
         settings: { soundEnabled }
@@ -1075,7 +1239,12 @@
 
         if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
 
-        tasks = backup.tasks;
+        tasks = backup.tasks.map(task => {
+          if (!task.type) task.type = "routine";
+          if (!task.doneDates) task.doneDates = [];
+          if (!task.days && task.type === "routine") task.days = [];
+          return task;
+        });
         soundEnabled = !!backup.settings?.soundEnabled;
 
         localStorage.setItem("fom_sound_enabled", JSON.stringify(soundEnabled));
