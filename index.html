@@ -13,7 +13,6 @@
       --bg2: #09091f;
       --bg3: #03030a;
       --card: rgba(255,255,255,.09);
-      --card2: rgba(0,0,0,.24);
       --line: rgba(255,255,255,.14);
       --text2: #b8c7ff;
       --blue: #00e5ff;
@@ -52,25 +51,9 @@
       font-size: 21px;
     }
 
-    .header {
-      text-align: center;
-      margin-top: 18px;
-      margin-bottom: 16px;
-      padding-top: 4px;
-    }
-
-    .logo {
-      font-size: 42px;
-      font-weight: 900;
-      letter-spacing: .5px;
-    }
-
-    .subtitle {
-      color: var(--text2);
-      font-size: 14px;
-      margin-top: 4px;
-      line-height: 1.35;
-    }
+    .header { text-align: center; margin-top: 18px; margin-bottom: 16px; padding-top: 4px; }
+    .logo { font-size: 42px; font-weight: 900; letter-spacing: .5px; }
+    .subtitle { color: var(--text2); font-size: 14px; margin-top: 4px; line-height: 1.35; }
 
     .card {
       background: var(--card);
@@ -92,11 +75,7 @@
       cursor: pointer;
     }
 
-    .section-title {
-      font-size: 19px;
-      font-weight: 900;
-    }
-
+    .section-title { font-size: 19px; font-weight: 900; }
     .chevron { color: var(--text2); font-size: 18px; transition: .25s; }
     .collapsed .chevron { transform: rotate(-90deg); }
     .section-body { margin-top: 14px; }
@@ -113,17 +92,8 @@
     }
 
     .top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-    .metric p {
-      color: var(--text2);
-      font-size: 13px;
-      margin-bottom: 4px;
-    }
-
-    .metric h2 {
-      font-size: 32px;
-      line-height: 1.1;
-    }
+    .metric p { color: var(--text2); font-size: 13px; margin-bottom: 4px; }
+    .metric h2 { font-size: 32px; line-height: 1.1; }
 
     .progress-bar {
       width: 100%;
@@ -143,71 +113,27 @@
       box-shadow: 0 0 18px rgba(0,229,255,.55);
     }
 
-    .timeline {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-      position: relative;
-    }
+    .timeline { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; position: relative; }
+    .timeline::before { content: ""; position: absolute; top: 21px; left: 20px; right: 20px; height: 4px; background: rgba(255,255,255,.18); z-index: 0; border-radius: 10px; }
+    .day { position: relative; z-index: 1; text-align: center; font-size: 11px; color: #cbd5ff; width: 44px; }
+    .circle { width: 42px; height: 42px; border-radius: 50%; background: #111827; border: 2px solid #4f46e5; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 900; margin-bottom: 5px; }
+    .circle.done { background: linear-gradient(135deg, var(--blue), var(--purple)); border-color: white; color: white; }
 
-    .timeline::before {
-      content: "";
-      position: absolute;
-      top: 21px;
-      left: 20px;
-      right: 20px;
-      height: 4px;
-      background: rgba(255,255,255,.18);
-      z-index: 0;
-      border-radius: 10px;
-    }
-
-    .day {
-      position: relative;
-      z-index: 1;
-      text-align: center;
-      font-size: 11px;
-      color: #cbd5ff;
-      width: 44px;
-    }
-
-    .circle {
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: #111827;
-      border: 2px solid #4f46e5;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      font-weight: 900;
-      margin-bottom: 5px;
-    }
-
-    .circle.done {
-      background: linear-gradient(135deg, var(--blue), var(--purple));
-      border-color: white;
-      color: white;
-    }
+    .quick-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .quick-row button { flex: 1; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16); color: #fff; }
 
     .task {
       background: rgba(0,0,0,.22);
-      border-radius: 18px;
-      padding: 13px;
-      margin-bottom: 10px;
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items: center;
+      border-radius: 16px;
+      padding: 11px 12px;
+      margin-bottom: 9px;
       border: 1px solid rgba(255,255,255,.08);
       position: relative;
     }
 
     .task.done {
-      border: 1px solid var(--blue);
-      background: rgba(0,229,255,.12);
+      border: 1px solid rgba(34,197,94,.7);
+      background: rgba(34,197,94,.10);
     }
 
     .task.late {
@@ -220,24 +146,57 @@
       box-shadow: 0 0 0 1px rgba(34,197,94,.18);
     }
 
-    .task small {
-      color: #aab6ff;
-      display: block;
-      margin-bottom: 4px;
-      font-size: 12px;
-      line-height: 1.3;
+    .task-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
     }
 
-    .task strong {
-      font-size: 17px;
-      line-height: 1.22;
+    .task-main {
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .task-time {
+      color: #aab6ff;
+      display: block;
+      margin-bottom: 3px;
+      font-size: 11px;
+      line-height: 1.2;
+      font-weight: 700;
+    }
+
+    .task-title {
+      font-size: 16px;
+      line-height: 1.18;
+      font-weight: 900;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .task-details {
+      display: none;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255,255,255,.12);
+    }
+
+    .task.open .task-details { display: block; }
+
+    .detail-line {
+      color: var(--text2);
+      font-size: 13px;
+      line-height: 1.35;
+      margin-bottom: 9px;
     }
 
     .task-actions {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
-      align-items: stretch;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     button {
@@ -251,16 +210,19 @@
       font-size: 14px;
     }
 
-    .icon-btn {
-      min-width: 42px;
-      padding: 10px;
-      line-height: 1;
+    .complete-mini {
+      min-width: 86px;
+      padding: 10px 11px;
+      background: linear-gradient(135deg,#2563eb,#8b5cf6);
     }
 
+    .complete-mini.done {
+      background: linear-gradient(135deg,#16a34a,#22c55e);
+    }
+
+    .icon-btn { min-width: 42px; padding: 10px; line-height: 1; }
     .edit { background: linear-gradient(135deg,#f59e0b,#ec4899); }
     .delete { background: var(--red); }
-    .done-btn { background: linear-gradient(135deg,#2563eb,#8b5cf6); }
-    .done-btn.done { background: linear-gradient(135deg,#16a34a,#22c55e); }
 
     input, textarea {
       width: 100%;
@@ -274,11 +236,7 @@
       font-size: 16px;
     }
 
-    textarea {
-      min-height: 88px;
-      resize: vertical;
-      font-size: 12px;
-    }
+    textarea { min-height: 88px; resize: vertical; font-size: 12px; }
 
     input[type="time"] {
       min-height: 52px;
@@ -286,11 +244,7 @@
       -webkit-appearance: none;
     }
 
-    .time-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    .time-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     .days-picker {
       display: grid;
@@ -312,11 +266,7 @@
       gap: 5px;
     }
 
-    .days-picker input {
-      width: auto;
-      margin: 0;
-      accent-color: var(--blue);
-    }
+    .days-picker input { width: auto; margin: 0; accent-color: var(--blue); }
 
     .add-btn {
       width: 100%;
@@ -351,17 +301,19 @@
       margin-bottom: 3px;
     }
 
-    .quick-row {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .quick-row button {
-      flex: 1;
-      background: rgba(255,255,255,.12);
-      border: 1px solid rgba(255,255,255,.16);
-      color: #fff;
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 26px;
+      height: 24px;
+      padding: 0 8px;
+      background: rgba(0,229,255,.16);
+      border: 1px solid rgba(0,229,255,.22);
+      color: #dffbff;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
     }
 
     #toast {
@@ -408,28 +360,9 @@
       box-shadow: 0 24px 70px rgba(0,0,0,.55);
     }
 
-    .modal .big {
-      font-size: 56px;
-      margin-bottom: 8px;
-    }
-
-    .modal h2 {
-      font-size: 26px;
-      margin-bottom: 10px;
-    }
-
-    .modal p {
-      color: #d9e2ff;
-      line-height: 1.42;
-      margin-bottom: 18px;
-    }
-
-    .mini-note {
-      font-size: 12px;
-      color: var(--text2);
-      margin-top: -4px;
-      margin-bottom: 10px;
-    }
+    .modal .big { font-size: 56px; margin-bottom: 8px; }
+    .modal h2 { font-size: 26px; margin-bottom: 10px; }
+    .modal p { color: #d9e2ff; line-height: 1.42; margin-bottom: 18px; }
 
     .footer {
       text-align: center;
@@ -443,8 +376,7 @@
       .logo { font-size: 36px; }
       .card { border-radius: 20px; padding: 14px; }
       .days-picker { grid-template-columns: repeat(3, 1fr); }
-      .task { grid-template-columns: 1fr; }
-      .task-actions { flex-direction: row; }
+      .complete-mini { min-width: 74px; font-size: 13px; }
     }
   </style>
 </head>
@@ -489,15 +421,15 @@
 
     <div class="card" id="agendaCard">
       <div class="section-header" onclick="toggleCollapse('agendaCard')">
-        <h3 class="section-title">Agenda de hoje</h3>
+        <h3 class="section-title">Pendentes de hoje <span class="badge" id="pendingBadge">0</span></h3>
         <span class="chevron">⌄</span>
       </div>
       <div class="section-body">
         <div class="quick-row">
           <button onclick="scrollToNextMission()">Próxima missão</button>
-          <button onclick="toggleCompactAgenda()">Compactar</button>
+          <button onclick="document.getElementById('formCard').classList.remove('collapsed'); document.getElementById('formTitle').scrollIntoView({behavior:'smooth'});">Nova missão</button>
         </div>
-        <div id="tasksList"></div>
+        <div id="pendingTasksList"></div>
       </div>
     </div>
 
@@ -528,6 +460,16 @@
         <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
         <button class="add-btn" id="saveTaskBtn" onclick="saveTaskFromForm()">Adicionar missão</button>
         <button class="cancel-btn" id="cancelEditBtn" onclick="cancelEdit()" style="display:none;">Cancelar edição</button>
+      </div>
+    </div>
+
+    <div class="card collapsed" id="doneCard">
+      <div class="section-header" onclick="toggleCollapse('doneCard')">
+        <h3 class="section-title">Missões concluídas <span class="badge" id="doneBadge">0</span></h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body">
+        <div id="doneTasksList"></div>
       </div>
     </div>
 
@@ -580,7 +522,6 @@
     ];
 
     let editingTaskId = null;
-    let compactAgenda = JSON.parse(localStorage.getItem("fom_compact_agenda")) || false;
     let soundEnabled = JSON.parse(localStorage.getItem("fom_sound_enabled")) || false;
     let lastCelebratedDay = localStorage.getItem("fom_last_day_celebrated") || "";
     let lastCelebratedWeek = localStorage.getItem("fom_last_week_celebrated") || "";
@@ -641,15 +582,20 @@
     function render() {
       const today = todayKey();
       const todayTasks = getTasksByDate(today);
+      const pendingTasks = todayTasks.filter(t => !t.doneDates.includes(today));
+      const doneTasks = todayTasks.filter(t => t.doneDates.includes(today));
       const progress = getProgressByDate(today);
 
       document.getElementById("todayPercent").innerText = progress.percent + "%";
       document.getElementById("progressFill").style.width = progress.percent + "%";
       document.getElementById("todayCount").innerText = `${progress.done} de ${progress.total} ${progress.total === 1 ? "missão concluída" : "missões concluídas"}`;
       document.getElementById("streak").innerText = calculateStreak() + "🔥";
+      document.getElementById("pendingBadge").innerText = pendingTasks.length;
+      document.getElementById("doneBadge").innerText = doneTasks.length;
 
       renderNotice(progress);
-      renderTasks(todayTasks, today);
+      renderTaskList("pendingTasksList", pendingTasks, today, false);
+      renderTaskList("doneTasksList", doneTasks, today, true);
       renderTimeline();
       renderTomorrow();
       renderHistory();
@@ -691,15 +637,15 @@
       return "";
     }
 
-    function renderTasks(todayTasks, today) {
-      const list = document.getElementById("tasksList");
+    function renderTaskList(elementId, listTasks, today, isDoneGroup) {
+      const list = document.getElementById(elementId);
 
-      if (!todayTasks.length) {
-        list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`;
+      if (!listTasks.length) {
+        list.innerHTML = `<div class="empty">${isDoneGroup ? "Nenhuma missão concluída ainda." : "Nenhuma missão pendente por agora."}</div>`;
         return;
       }
 
-      list.innerHTML = todayTasks.map(task => {
+      list.innerHTML = listTasks.map(task => {
         const done = task.doneDates.includes(today);
         const programmedDays = task.days.map(id => days.find(d => d.id === id)?.name).join(", ");
         const status = getTaskStatus(task, today);
@@ -707,18 +653,32 @@
 
         return `
           <div class="task ${done ? "done" : ""} ${status}" id="task-${task.id}">
-            <div>
-              <small>${task.start} - ${task.end}${compactAgenda ? "" : " • " + programmedDays}${statusLabel}</small>
-              <strong>${task.title}</strong>
+            <div class="task-row">
+              <div class="task-main" onclick="toggleTaskDetails(${task.id})">
+                <span class="task-time">${task.start} - ${task.end}${statusLabel}</span>
+                <div class="task-title">${task.title}</div>
+              </div>
+              <button class="complete-mini ${done ? "done" : ""}" onclick="toggleDone(${task.id})">${done ? "Reabrir" : "Concluir"}</button>
             </div>
-            <div class="task-actions">
-              <button class="icon-btn edit" onclick="editTask(${task.id})">✏️</button>
-              <button class="done-btn ${done ? "done" : ""}" onclick="toggleDone(${task.id})">${done ? "Feito" : "Concluir"}</button>
-              <button class="delete icon-btn" onclick="deleteTask(${task.id})">X</button>
+
+            <div class="task-details">
+              <div class="detail-line">
+                <strong>Programação:</strong> ${programmedDays}<br>
+                <strong>Horário:</strong> ${task.start} até ${task.end}
+              </div>
+              <div class="task-actions">
+                <button class="edit" onclick="editTask(${task.id})">✏️ Editar</button>
+                <button class="delete" onclick="deleteTask(${task.id})">Excluir</button>
+              </div>
             </div>
           </div>
         `;
       }).join("");
+    }
+
+    function toggleTaskDetails(id) {
+      const el = document.getElementById(`task-${id}`);
+      if (el) el.classList.toggle("open");
     }
 
     function renderTimeline() {
@@ -900,7 +860,7 @@
 
         checkPerfectWeek();
       } else {
-        showToast("Missão reaberta.");
+        showToast("Missão voltou para pendentes.");
       }
     }
 
@@ -926,12 +886,6 @@
       }
 
       return streak;
-    }
-
-    function isPerfectWeek() {
-      for (let i = 0; i < 7; i++) {
-        const p = getProgressByDate(-i);
-      }
     }
 
     function getWeekKey() {
@@ -1086,13 +1040,6 @@
       if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
-    function toggleCompactAgenda() {
-      compactAgenda = !compactAgenda;
-      localStorage.setItem("fom_compact_agenda", JSON.stringify(compactAgenda));
-      render();
-      showToast(compactAgenda ? "Agenda compacta ativada." : "Agenda completa ativada.");
-    }
-
     function toggleCollapse(id) {
       document.getElementById(id).classList.toggle("collapsed");
     }
@@ -1100,10 +1047,10 @@
     function exportData() {
       const backup = {
         app: "FOM",
-        version: 3,
+        version: 4,
         exportedAt: new Date().toISOString(),
         tasks,
-        settings: { compactAgenda, soundEnabled }
+        settings: { soundEnabled }
       };
 
       document.getElementById("syncBox").value = btoa(unescape(encodeURIComponent(JSON.stringify(backup))));
@@ -1129,10 +1076,8 @@
         if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
 
         tasks = backup.tasks;
-        compactAgenda = !!backup.settings?.compactAgenda;
         soundEnabled = !!backup.settings?.soundEnabled;
 
-        localStorage.setItem("fom_compact_agenda", JSON.stringify(compactAgenda));
         localStorage.setItem("fom_sound_enabled", JSON.stringify(soundEnabled));
 
         updateSoundIcon();
