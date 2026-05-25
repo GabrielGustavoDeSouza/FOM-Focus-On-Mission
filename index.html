@@ -1,23 +1,481 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FOM - Focus On Mission</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1d2bff 0%, #09091f 40%, #03030a 100%);
+      color: white;
+      padding: 18px;
+    }
+
+    .app {
+      max-width: 430px;
+      margin: 0 auto;
+      padding-bottom: 30px;
+    }
+
+    .header {
+      text-align: center;
+      margin-top: 12px;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      font-size: 42px;
+      font-weight: bold;
+    }
+
+    .subtitle {
+      color: #b8c7ff;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 24px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(12px);
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .metric h2 {
+      font-size: 34px;
+      margin-top: 6px;
+    }
+
+    .metric p {
+      color: #b8c7ff;
+      font-size: 13px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 14px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00e5ff, #8b5cf6, #ff4ecd);
+      border-radius: 99px;
+      transition: 0.4s;
+    }
+
+    .notice {
+      background: linear-gradient(135deg, #6d28d9, #2563eb);
+      border-radius: 22px;
+      padding: 16px;
+      margin-bottom: 16px;
+      font-weight: bold;
+      line-height: 1.4;
+    }
+
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 16px;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      top: 21px;
+      left: 20px;
+      right: 20px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.18);
+      z-index: 0;
+      border-radius: 10px;
+    }
+
+    .day {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      font-size: 11px;
+      color: #cbd5ff;
+    }
+
+    .circle {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #111827;
+      border: 2px solid #4f46e5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .circle.done {
+      background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+      border-color: white;
+      color: white;
+    }
+
+    .section-title {
+      font-size: 19px;
+      margin-bottom: 14px;
+    }
+
+    .task {
+      background: rgba(0, 0, 0, 0.24);
+      border-radius: 18px;
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .task.done {
+      border: 1px solid #00e5ff;
+      background: rgba(0, 229, 255, 0.12);
+    }
+
+    .task small {
+      color: #aab6ff;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 11px 13px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2563eb, #8b5cf6);
+    }
+
+    .delete {
+      background: #ef4444;
+      margin-left: 5px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      margin-bottom: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(0,0,0,0.28);
+      color: white;
+      outline: none;
+    }
+
+    option {
+      color: black;
+    }
+
+    .add-btn {
+      width: 100%;
+      margin-top: 4px;
+      background: linear-gradient(135deg, #00e5ff, #8b5cf6);
+    }
+
+    .empty {
+      color: #aab6ff;
+      font-size: 14px;
+      text-align: center;
+      padding: 12px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #7f8cff;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+  </style>
 </head>
-<body class="bg-black text-white">
 
-  <div id="app"></div>
-
-<script>
-  document.getElementById("app").innerHTML = `
-    <div style="text-align:center; padding:40px;">
-      <h1 style="font-size:40px;">🔥 FOM</h1>
-      <h2>Focus On Mission</h2>
-      <p>Seu app vai nascer aqui 🚀</p>
+<body>
+  <div class="app">
+    <div class="header">
+      <div class="logo">⚡ FOM</div>
+      <div class="subtitle">Focus On Mission</div>
+      <div class="subtitle">Sua disciplina em modo missão</div>
     </div>
-  `;
-</script>
 
+    <div class="notice" id="notice">
+      Sua ofensiva depende da próxima missão. Não quebra a sequência.
+    </div>
+
+    <div class="top-grid">
+      <div class="card metric">
+        <p>Progresso hoje</p>
+        <h2 id="todayPercent">0%</h2>
+      </div>
+
+      <div class="card metric">
+        <p>Ofensiva</p>
+        <h2 id="streak">0🔥</h2>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Barra do dia</h3>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+      <p class="subtitle" id="todayCount" style="margin-top:10px;">0 de 0 missões concluídas</p>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Timeline da semana</h3>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Agenda de hoje</h3>
+      <div id="tasksList"></div>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Adicionar missão</h3>
+
+      <select id="taskDay">
+        <option value="1">Segunda</option>
+        <option value="2">Terça</option>
+        <option value="3">Quarta</option>
+        <option value="4">Quinta</option>
+        <option value="5">Sexta</option>
+        <option value="6">Sábado</option>
+        <option value="0">Domingo</option>
+      </select>
+
+      <input type="time" id="taskTime" value="08:00" />
+      <input type="text" id="taskTitle" placeholder="Ex: Estudar inglês" />
+
+      <button class="add-btn" onclick="addTask()">Adicionar missão</button>
+    </div>
+
+    <div class="footer">
+      FOM App • Focus On Mission • by Gabriel
+    </div>
+  </div>
+
+  <script>
+    const days = [
+      { id: 1, name: "SEG" },
+      { id: 2, name: "TER" },
+      { id: 3, name: "QUA" },
+      { id: 4, name: "QUI" },
+      { id: 5, name: "SEX" },
+      { id: 6, name: "SÁB" },
+      { id: 0, name: "DOM" }
+    ];
+
+    let tasks = JSON.parse(localStorage.getItem("fom_tasks")) || [
+      { id: Date.now() + 1, day: 1, time: "07:30", title: "Estudar inglês", doneDates: [] },
+      { id: Date.now() + 2, day: 1, time: "20:00", title: "Revisar projetos", doneDates: [] },
+      { id: Date.now() + 3, day: 2, time: "07:30", title: "Estudar inglês", doneDates: [] }
+    ];
+
+    function save() {
+      localStorage.setItem("fom_tasks", JSON.stringify(tasks));
+    }
+
+    function todayKey(offset = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function getDayFromDate(dateKey) {
+      return new Date(dateKey + "T12:00:00").getDay();
+    }
+
+    function todayDay() {
+      return new Date().getDay();
+    }
+
+    function render() {
+      const today = todayKey();
+      const day = todayDay();
+
+      const todayTasks = tasks
+        .filter(t => Number(t.day) === day)
+        .sort((a, b) => a.time.localeCompare(b.time));
+
+      const doneToday = todayTasks.filter(t => t.doneDates.includes(today)).length;
+      const percent = todayTasks.length ? Math.round((doneToday / todayTasks.length) * 100) : 0;
+
+      document.getElementById("todayPercent").innerText = percent + "%";
+      document.getElementById("progressFill").style.width = percent + "%";
+      document.getElementById("todayCount").innerText = `${doneToday} de ${todayTasks.length} missões concluídas`;
+
+      document.getElementById("streak").innerText = calculateStreak() + "🔥";
+
+      const notice = document.getElementById("notice");
+      if (percent === 100 && todayTasks.length > 0) {
+        notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
+      } else if (todayTasks.length === 0) {
+        notice.innerText = "Hoje ainda não tem missão cadastrada. Crie uma missão para começar sua ofensiva.";
+      } else {
+        notice.innerText = `Faltam ${todayTasks.length - doneToday} missão(ões) para fechar 100% hoje.`;
+      }
+
+      renderTasks(todayTasks, today);
+      renderTimeline();
+    }
+
+    function renderTasks(todayTasks, today) {
+      const list = document.getElementById("tasksList");
+
+      if (!todayTasks.length) {
+        list.innerHTML = `<div class="empty">Nenhuma missão cadastrada para hoje.</div>`;
+        return;
+      }
+
+      list.innerHTML = todayTasks.map(task => {
+        const done = task.doneDates.includes(today);
+
+        return `
+          <div class="task ${done ? "done" : ""}">
+            <div>
+              <small>${task.time}</small>
+              <strong>${task.title}</strong>
+            </div>
+            <div>
+              <button onclick="toggleDone(${task.id})">${done ? "Feito" : "Concluir"}</button>
+              <button class="delete" onclick="deleteTask(${task.id})">X</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderTimeline() {
+      const timeline = document.getElementById("timeline");
+      const currentDay = todayDay();
+
+      timeline.innerHTML = days.map(d => {
+        const dayTasks = tasks.filter(t => Number(t.day) === d.id);
+
+        let offset = d.id - currentDay;
+        if (offset > 0) offset -= 7;
+
+        const date = todayKey(offset);
+        const done = dayTasks.length && dayTasks.every(t => t.doneDates.includes(date));
+
+        return `
+          <div class="day">
+            <div class="circle ${done ? "done" : ""}">
+              ${done ? "100" : "0"}%
+            </div>
+            ${d.name}
+          </div>
+        `;
+      }).join("");
+    }
+
+    function addTask() {
+      const day = document.getElementById("taskDay").value;
+      const time = document.getElementById("taskTime").value;
+      const title = document.getElementById("taskTitle").value.trim();
+
+      if (!title) {
+        alert("Digite o nome da missão.");
+        return;
+      }
+
+      tasks.push({
+        id: Date.now(),
+        day: Number(day),
+        time,
+        title,
+        doneDates: []
+      });
+
+      document.getElementById("taskTitle").value = "";
+      save();
+      render();
+    }
+
+    function toggleDone(id) {
+      const today = todayKey();
+
+      tasks = tasks.map(task => {
+        if (task.id !== id) return task;
+
+        const alreadyDone = task.doneDates.includes(today);
+
+        return {
+          ...task,
+          doneDates: alreadyDone
+            ? task.doneDates.filter(d => d !== today)
+            : [...task.doneDates, today]
+        };
+      });
+
+      save();
+      render();
+    }
+
+    function deleteTask(id) {
+      if (!confirm("Deseja excluir essa missão?")) return;
+      tasks = tasks.filter(task => task.id !== id);
+      save();
+      render();
+    }
+
+    function calculateStreak() {
+      let streak = 0;
+
+      for (let i = 0; i < 365; i++) {
+        const date = todayKey(-i);
+        const day = getDayFromDate(date);
+        const dayTasks = tasks.filter(t => Number(t.day) === day);
+
+        if (!dayTasks.length) break;
+
+        const completed = dayTasks.every(t => t.doneDates.includes(date));
+
+        if (completed) {
+          streak++;
+        } else {
+          break;
+        }
+      }
+
+      return streak;
+    }
+
+    render();
+  </script>
 </body>
 </html>
