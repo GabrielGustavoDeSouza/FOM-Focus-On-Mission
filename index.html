@@ -565,6 +565,137 @@
       100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,78,205,0); }
     }
 
+
+    /* ===== FOM V10: perfil, rankings, loja e temas ===== */
+    .v10-profile {
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .avatar-ring {
+      width: 72px;
+      height: 72px;
+      border-radius: 24px;
+      background: linear-gradient(135deg,var(--blue),var(--purple),var(--pink));
+      padding: 3px;
+      box-shadow: 0 12px 34px rgba(0,0,0,.38);
+    }
+
+    .avatar-core {
+      width: 100%;
+      height: 100%;
+      border-radius: 21px;
+      background: radial-gradient(circle at 30% 25%, #fff176, #ff4ecd 42%, #4f46e5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+    }
+
+    .title-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(0,229,255,.16);
+      border: 1px solid rgba(0,229,255,.25);
+      color: #e9fbff;
+      font-size: 12px;
+      font-weight: 900;
+      margin-top: 8px;
+    }
+
+    .profile-grid, .rank-grid, .shop-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .mini-panel, .rank-card, .shop-item {
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 12px;
+    }
+
+    .mini-panel small, .rank-card small, .shop-item small {
+      color: var(--text2);
+      display: block;
+      font-size: 11px;
+      margin-bottom: 4px;
+      line-height: 1.35;
+    }
+
+    .mini-panel strong, .rank-card strong {
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .shop-item h4 {
+      font-size: 15px;
+      margin-bottom: 7px;
+    }
+
+    .shop-item button {
+      width: 100%;
+      margin-top: 10px;
+      font-size: 12px;
+      padding: 10px 8px;
+    }
+
+    .theme-preview {
+      height: 34px;
+      border-radius: 12px;
+      margin: 8px 0;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+
+    .category-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .category-row:last-child { border-bottom: none; }
+
+    .category-name { font-weight: 900; }
+    .category-score { color: var(--text2); font-size: 12px; }
+
+    .shield-counter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 30px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(34,197,94,.16);
+      border: 1px solid rgba(34,197,94,.25);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .theme-active {
+      outline: 2px solid var(--blue);
+      box-shadow: 0 0 18px rgba(0,229,255,.25);
+    }
+
+    .v10-note {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.08);
+      color: var(--text2);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
     .footer {
       text-align: center;
       color: #7f8cff;
@@ -588,8 +719,8 @@
 
   <div class="onboarding" id="onboarding">
     <div class="onboarding-card">
-      <h2>⚡ Bem-vindo ao FOM V8</h2>
-      <p>Agora seu app tem gamificação: XP, nível, moedas, conquistas, mascote e comando de voz básico.</p>
+      <h2>⚡ Bem-vindo ao FOM V10</h2>
+      <p>Agora seu app tem perfil, títulos, ranking local, loja, escudos, temas, moedas, XP e comando de voz.</p>
       <ul>
         <li>Concluir missão gera XP e moedas.</li>
         <li>Bater 90% protege a ofensiva.</li>
@@ -753,6 +884,83 @@
       <div class="section-body" id="historyList"></div>
     </div>
 
+
+    <div class="card" id="profileCard">
+      <div class="v10-profile">
+        <div class="avatar-ring"><div class="avatar-core">⚡</div></div>
+        <div>
+          <div class="section-title">Perfil FOM</div>
+          <p class="subtitle" id="profileSummary">Sua identidade de disciplina.</p>
+          <div class="title-pill" id="currentTitle">🌱 Começando</div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <div class="mini-panel"><small>Categoria dominante</small><strong id="dominantCategory">💼 Produtividade</strong></div>
+        <div class="mini-panel"><small>Escudos</small><strong><span id="shieldCount">0</span> 🛡️</strong></div>
+        <div class="mini-panel"><small>Missões concluídas</small><strong id="totalDonePanel">0</strong></div>
+        <div class="mini-panel"><small>Consistência 7 dias</small><strong id="consistencyPanel">0%</strong></div>
+      </div>
+
+      <div class="v10-note" id="v10CoachNote">
+        O FOM agora identifica sua categoria dominante, título atual e evolução pessoal.
+      </div>
+    </div>
+
+    <div class="card collapsed" id="rankingCard">
+      <div class="section-header" onclick="toggleCollapse('rankingCard')">
+        <h3 class="section-title">Rankings locais</h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body">
+        <div class="rank-grid">
+          <div class="rank-card"><small>Ranking geral</small><strong id="rankGeneral">#1 local</strong></div>
+          <div class="rank-card"><small>Ofensiva</small><strong id="rankStreak">0 dias</strong></div>
+          <div class="rank-card"><small>Categoria top</small><strong id="rankCategory">Produtividade</strong></div>
+          <div class="rank-card"><small>Nível atual</small><strong id="rankLevel">1</strong></div>
+        </div>
+        <div id="categoryRanking" style="margin-top:12px;"></div>
+      </div>
+    </div>
+
+    <div class="card collapsed" id="shopCard">
+      <div class="section-header" onclick="toggleCollapse('shopCard')">
+        <h3 class="section-title">Loja FOM</h3>
+        <span class="chevron">⌄</span>
+      </div>
+      <div class="section-body">
+        <p class="subtitle">Use moedas para desbloquear temas e proteger sua ofensiva.</p>
+        <div class="shop-grid">
+          <div class="shop-item">
+            <h4>🛡️ Escudo</h4>
+            <small>Protege 1 dia ruim abaixo de 90%.</small>
+            <button onclick="buyShield()">500 moedas</button>
+          </div>
+
+          <div class="shop-item" id="theme-matrix">
+            <h4>💚 Matrix</h4>
+            <div class="theme-preview" style="background:linear-gradient(135deg,#021b11,#00ff88);"></div>
+            <small>Tema verde hacker.</small>
+            <button onclick="buyOrApplyTheme('matrix',700)">700 moedas</button>
+          </div>
+
+          <div class="shop-item" id="theme-inferno">
+            <h4>🔥 Inferno</h4>
+            <div class="theme-preview" style="background:linear-gradient(135deg,#2b0000,#ff3b30,#ff9500);"></div>
+            <small>Tema energia máxima.</small>
+            <button onclick="buyOrApplyTheme('inferno',1000)">1000 moedas</button>
+          </div>
+
+          <div class="shop-item" id="theme-galaxy">
+            <h4>🌌 Galaxy</h4>
+            <div class="theme-preview" style="background:linear-gradient(135deg,#0f172a,#4f46e5,#ff4ecd);"></div>
+            <small>Exige 90 dias de ofensiva.</small>
+            <button onclick="buyOrApplyTheme('galaxy',2000,90)">2000 moedas</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card collapsed" id="backupCard">
       <div class="section-header" onclick="toggleCollapse('backupCard')">
         <h3 class="section-title">Backup / Sincronizar</h3>
@@ -781,7 +989,11 @@
       xp: 0,
       coins: 0,
       totalDone: 0,
-      unlocked: []
+      unlocked: [],
+      shields: 0,
+      themes: ["default"],
+      activeTheme: "default",
+      nickname: "Gabriel"
     };
 
     function setupAppIcon() {
@@ -923,6 +1135,7 @@
       renderHistory();
       renderUpcomingScheduled();
       renderGame();
+      renderV10();
     }
 
     function renderNotice(progress) {
@@ -1825,6 +2038,7 @@
         version: 5,
         exportedAt: new Date().toISOString(),
         tasks,
+        player,
         settings: { soundEnabled }
       };
 
@@ -1850,6 +2064,11 @@
 
         if (!confirm("Importar vai substituir os dados deste aparelho. Deseja continuar?")) return;
 
+        if (backup.player) {
+          player = backup.player;
+          ensurePlayerV10();
+        }
+
         tasks = backup.tasks.map(task => {
           if (!task.type) task.type = "routine";
           if (!task.doneDates) task.doneDates = [];
@@ -1870,7 +2089,247 @@
     }
 
     setInterval(render, 60000);
+
+    function ensurePlayerV10() {
+      if (!player.unlocked) player.unlocked = [];
+      if (!player.themes) player.themes = ["default"];
+      if (!player.activeTheme) player.activeTheme = "default";
+      if (!player.shields) player.shields = 0;
+      if (!player.nickname) player.nickname = "Gabriel";
+      savePlayer();
+    }
+
+    function getCurrentTitle() {
+      const streak = calculateStreak();
+      if (streak >= 730) return "🌌 FOM Master";
+      if (streak >= 365) return "🏆 Lenda da Disciplina";
+      if (streak >= 180) return "👑 Elite da Rotina";
+      if (streak >= 90) return "💎 Inabalável";
+      if (streak >= 60) return "⚔️ Modo Missão";
+      if (streak >= 30) return "🚀 Disciplinado";
+      if (streak >= 21) return "🧠 Criador de Hábitos";
+      if (streak >= 14) return "🛡️ Comprometido";
+      if (streak >= 7) return "🔥 Persistente";
+      if (streak >= 3) return "⚡ Iniciado";
+      return "🌱 Começando";
+    }
+
+    function getCategoryScores() {
+      const categories = {
+        estudos: { label: "📚 Estudos", words: ["estudar","ingles","inglês","leitura","curso","faculdade","aula","livro"] },
+        fitness: { label: "💪 Fitness", words: ["academia","treino","corrida","cardio","musculacao","musculação","caminhada"] },
+        produtividade: { label: "💼 Produtividade", words: ["projeto","reuniao","reunião","power bi","dashboard","relatorio","relatório","planejamento","trabalho"] },
+        saude: { label: "🧘 Saúde", words: ["agua","água","dormir","meditacao","meditação","alimentacao","alimentação","remedio","remédio"] },
+        familia: { label: "👨‍👩‍👧 Família", words: ["familia","família","camila","filha","esposa","pais","mae","mãe","pai"] }
+      };
+
+      const scores = {};
+      Object.keys(categories).forEach(k => scores[k] = { label: categories[k].label, count: 0, done: 0 });
+
+      tasks.forEach(task => {
+        const title = normalizeText(task.title);
+        let matched = false;
+
+        Object.entries(categories).forEach(([key, cat]) => {
+          if (cat.words.some(w => title.includes(normalizeText(w)))) {
+            scores[key].count += 1;
+            scores[key].done += (task.doneDates || []).length;
+            matched = true;
+          }
+        });
+
+        if (!matched) {
+          if (!scores.outros) scores.outros = { label: "✨ Outros", count: 0, done: 0 };
+          scores.outros.count += 1;
+          scores.outros.done += (task.doneDates || []).length;
+        }
+      });
+
+      return scores;
+    }
+
+    function getDominantCategory() {
+      const scores = getCategoryScores();
+      const best = Object.values(scores).sort((a,b) => (b.done + b.count) - (a.done + a.count))[0];
+      return best ? best.label : "💼 Produtividade";
+    }
+
+    function getConsistency7Days() {
+      let total = 0;
+      let score = 0;
+
+      for (let i = 0; i < 7; i++) {
+        const p = getProgressByDate(todayKey(-i));
+        if (p.total > 0) {
+          total += 1;
+          if (p.percent >= OFFENSIVE_GOAL_PERCENT) score += 1;
+        }
+      }
+
+      return total ? Math.round((score / total) * 100) : 0;
+    }
+
+    function renderV10() {
+      ensurePlayerV10();
+
+      const title = getCurrentTitle();
+      const dominant = getDominantCategory();
+      const consistency = getConsistency7Days();
+
+      const titleEl = document.getElementById("currentTitle");
+      const domEl = document.getElementById("dominantCategory");
+      const shieldEl = document.getElementById("shieldCount");
+      const totalDoneEl = document.getElementById("totalDonePanel");
+      const consistencyEl = document.getElementById("consistencyPanel");
+      const summaryEl = document.getElementById("profileSummary");
+      const coachNote = document.getElementById("v10CoachNote");
+
+      if (titleEl) titleEl.innerText = title;
+      if (domEl) domEl.innerText = dominant;
+      if (shieldEl) shieldEl.innerText = player.shields || 0;
+      if (totalDoneEl) totalDoneEl.innerText = player.totalDone || 0;
+      if (consistencyEl) consistencyEl.innerText = consistency + "%";
+      if (summaryEl) summaryEl.innerText = `${title} • ${dominant}`;
+      if (coachNote) coachNote.innerText = `Seu padrão dominante hoje é ${dominant}. Sua consistência recente está em ${consistency}%.`;
+
+      const rankGeneral = document.getElementById("rankGeneral");
+      const rankStreak = document.getElementById("rankStreak");
+      const rankCategory = document.getElementById("rankCategory");
+      const rankLevel = document.getElementById("rankLevel");
+
+      if (rankGeneral) rankGeneral.innerText = "#1 local";
+      if (rankStreak) rankStreak.innerText = calculateStreak() + " dias";
+      if (rankCategory) rankCategory.innerText = dominant.replace(/[^\p{L}\p{N}\s]/gu, "").trim();
+      if (rankLevel) rankLevel.innerText = getLevel();
+
+      renderCategoryRanking();
+      applyTheme(player.activeTheme || "default");
+      updateShopButtons();
+    }
+
+    function renderCategoryRanking() {
+      const el = document.getElementById("categoryRanking");
+      if (!el) return;
+
+      const scores = Object.values(getCategoryScores())
+        .sort((a,b) => (b.done + b.count) - (a.done + a.count));
+
+      if (!scores.length) {
+        el.innerHTML = `<div class="empty">Sem categorias ainda.</div>`;
+        return;
+      }
+
+      el.innerHTML = scores.map((item, index) => `
+        <div class="category-row">
+          <div>
+            <div class="category-name">#${index + 1} ${item.label}</div>
+            <div class="category-score">${item.count} missões • ${item.done} conclusões</div>
+          </div>
+          <div class="badge">${item.done}</div>
+        </div>
+      `).join("");
+    }
+
+    function applyTheme(theme) {
+      const root = document.documentElement;
+
+      if (theme === "matrix") {
+        root.style.setProperty("--bg1", "#00351d");
+        root.style.setProperty("--bg2", "#03140c");
+        root.style.setProperty("--blue", "#00ff88");
+        root.style.setProperty("--purple", "#00aa55");
+        root.style.setProperty("--pink", "#7cffc4");
+      } else if (theme === "inferno") {
+        root.style.setProperty("--bg1", "#4a0000");
+        root.style.setProperty("--bg2", "#160303");
+        root.style.setProperty("--blue", "#ff3b30");
+        root.style.setProperty("--purple", "#ff9500");
+        root.style.setProperty("--pink", "#ffd166");
+      } else if (theme === "galaxy") {
+        root.style.setProperty("--bg1", "#120052");
+        root.style.setProperty("--bg2", "#09091f");
+        root.style.setProperty("--blue", "#ff4ecd");
+        root.style.setProperty("--purple", "#8b5cf6");
+        root.style.setProperty("--pink", "#00e5ff");
+      } else {
+        root.style.setProperty("--bg1", "#1d2bff");
+        root.style.setProperty("--bg2", "#09091f");
+        root.style.setProperty("--blue", "#00e5ff");
+        root.style.setProperty("--purple", "#8b5cf6");
+        root.style.setProperty("--pink", "#ff4ecd");
+      }
+    }
+
+    function updateShopButtons() {
+      ["matrix","inferno","galaxy"].forEach(theme => {
+        const card = document.getElementById("theme-" + theme);
+        if (!card) return;
+
+        card.classList.toggle("theme-active", player.activeTheme === theme);
+
+        const btn = card.querySelector("button");
+        if (!btn) return;
+
+        if ((player.themes || []).includes(theme)) {
+          btn.innerText = player.activeTheme === theme ? "Ativo" : "Usar tema";
+        }
+      });
+    }
+
+    function buyOrApplyTheme(theme, cost, requiredStreak = 0) {
+      ensurePlayerV10();
+
+      if ((player.themes || []).includes(theme)) {
+        player.activeTheme = theme;
+        savePlayer();
+        renderV10();
+        showToast("Tema aplicado.");
+        return;
+      }
+
+      if (requiredStreak && calculateStreak() < requiredStreak) {
+        showToast(`Esse tema exige ${requiredStreak} dias de ofensiva.`);
+        return;
+      }
+
+      if ((player.coins || 0) < cost) {
+        showToast("Moedas insuficientes.");
+        return;
+      }
+
+      player.coins -= cost;
+      player.themes.push(theme);
+      player.activeTheme = theme;
+
+      savePlayer();
+      renderGame();
+      renderV10();
+
+      fireConfetti(160);
+      showAchievement("🎨", "Tema desbloqueado!", "Seu visual evoluiu com sua disciplina.");
+    }
+
+    function buyShield() {
+      ensurePlayerV10();
+      const cost = 500;
+
+      if ((player.coins || 0) < cost) {
+        showToast("Moedas insuficientes.");
+        return;
+      }
+
+      player.coins -= cost;
+      player.shields = (player.shields || 0) + 1;
+
+      savePlayer();
+      renderGame();
+      renderV10();
+
+      showAchievement("🛡️", "Escudo comprado!", "Você tem uma proteção para um dia ruim.");
+    }
+
     render();
+    renderV10();
     maybeShowOnboarding();
   </script>
 </body>
