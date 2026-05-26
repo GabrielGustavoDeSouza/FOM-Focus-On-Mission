@@ -2334,3 +2334,202 @@
   </script>
 </body>
 </html>
+
+<!-- ========================= -->
+<!-- FOM V11 JORNADA -->
+<!-- ========================= -->
+
+<style>
+.journey-preview{
+margin-top:20px;
+padding:18px;
+border-radius:26px;
+background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));
+border:1px solid rgba(255,255,255,.08);
+overflow:hidden;
+}
+
+.journey-title{
+font-size:24px;
+font-weight:900;
+margin-bottom:6px;
+}
+
+.journey-sub{
+color:#b8c7ff;
+font-size:13px;
+margin-bottom:18px;
+}
+
+.journey-track{
+display:flex;
+gap:14px;
+overflow-x:auto;
+padding-bottom:10px;
+}
+
+.journey-node{
+min-width:70px;
+text-align:center;
+position:relative;
+}
+
+.journey-dot{
+width:46px;
+height:46px;
+border-radius:999px;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:0 auto 8px;
+font-weight:900;
+background:rgba(255,255,255,.08);
+border:2px solid rgba(255,255,255,.12);
+}
+
+.journey-node.done .journey-dot{
+background:linear-gradient(135deg,#00e5ff,#8b5cf6);
+border:none;
+}
+
+.journey-node.current .journey-dot{
+background:linear-gradient(135deg,#ff4ecd,#8b5cf6);
+transform:scale(1.15);
+}
+
+.journey-node.reward .journey-dot{
+box-shadow:0 0 18px rgba(255,209,102,.45);
+border-color:#ffd166;
+}
+
+.journey-day{
+font-size:11px;
+color:#d9e2ff;
+}
+
+.journey-label{
+font-size:10px;
+color:#9fb2ff;
+margin-top:4px;
+}
+
+.scenario-card{
+margin-top:20px;
+padding:16px;
+border-radius:20px;
+background:linear-gradient(135deg,rgba(0,229,255,.12),rgba(139,92,246,.16));
+border:1px solid rgba(255,255,255,.08);
+}
+
+.scenario-card strong{
+display:block;
+margin-bottom:8px;
+font-size:16px;
+}
+
+.quick-actions{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-top:18px;
+}
+
+.quick-btn{
+padding:12px 8px;
+border:none;
+border-radius:18px;
+background:rgba(255,255,255,.08);
+color:white;
+font-size:11px;
+font-weight:900;
+}
+</style>
+
+<script>
+function renderJourneyV11(){
+  const old = document.getElementById("journeyPreviewCard");
+  if(old) old.remove();
+
+  const streak = typeof calculateStreak === "function" ? calculateStreak() : 0;
+
+  const rewards = {
+    7:"🎁",
+    14:"🛡️",
+    21:"🚀",
+    28:"👑"
+  };
+
+  let scenarioTitle = "🔥 Semana 1 — Acampamento Inicial";
+  let scenarioText = "Cada dia concluído fortalece sua disciplina.";
+
+  if(streak >= 7){
+    scenarioTitle = "🌲 Semana 2 — Floresta da Consistência";
+    scenarioText = "Persistência detectada. Você entrou no modo missão.";
+  }
+
+  if(streak >= 14){
+    scenarioTitle = "🌉 Semana 3 — Ponte do Hábito";
+    scenarioText = "Seu cérebro está começando a aceitar sua nova identidade.";
+  }
+
+  if(streak >= 21){
+    scenarioTitle = "🚀 Semana 4 — Portal da Disciplina";
+    scenarioText = "Você começou a consolidar um hábito real.";
+  }
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "journey-preview";
+  wrapper.id = "journeyPreviewCard";
+
+  let nodes = "";
+
+  for(let i=1;i<=30;i++){
+    let cls = "journey-node";
+
+    if(i <= streak) cls += " done";
+    if(i === streak + 1) cls += " current";
+    if(rewards[i]) cls += " reward";
+
+    const icon = rewards[i] ? rewards[i] : (i <= streak ? "✓" : i);
+
+    nodes += `
+      <div class="${cls}">
+        <div class="journey-dot">${icon}</div>
+        <div class="journey-day">Dia ${i}</div>
+        <div class="journey-label">${rewards[i] ? "Recompensa" : ""}</div>
+      </div>
+    `;
+  }
+
+  wrapper.innerHTML = `
+    <div class="journey-title">⚡ Jornada FOM</div>
+    <div class="journey-sub">Avance um dia por vez.</div>
+
+    <div class="journey-track">
+      ${nodes}
+    </div>
+
+    <div class="scenario-card">
+      <strong>${scenarioTitle}</strong>
+      <div>${scenarioText}</div>
+    </div>
+
+    <div class="quick-actions">
+      <button class="quick-btn">➕ Missão</button>
+      <button class="quick-btn">🎙️ Voz</button>
+      <button class="quick-btn">🪙 Loja</button>
+      <button class="quick-btn">👤 Perfil</button>
+    </div>
+  `;
+
+  const main = document.querySelector(".container") || document.body;
+  main.prepend(wrapper);
+}
+
+setTimeout(()=>{
+  try{
+    renderJourneyV11();
+  }catch(e){}
+},500);
+</script>
+
