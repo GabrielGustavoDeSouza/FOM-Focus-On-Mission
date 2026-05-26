@@ -486,6 +486,22 @@
       margin-top: 10px;
     }
 
+
+    .voice-examples {
+      margin-top: 10px;
+      background: rgba(0,0,0,.20);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 10px;
+    }
+
+    .voice-examples small {
+      display: block;
+      color: var(--text2);
+      line-height: 1.45;
+      margin-bottom: 4px;
+    }
+
     .reward-chip {
       display: inline-flex;
       align-items: center;
@@ -577,7 +593,7 @@
       <ul>
         <li>Concluir missão gera XP e moedas.</li>
         <li>Bater 90% protege a ofensiva.</li>
-        <li>Fale: “concluir estudar inglês”.</li>
+        <li>Fale: “concluir estudar inglês”.</li><li>Fale: “criar missão sábado às 9 dentista”.</li><li>Fale: “criar rotina segunda quarta sexta às 7 academia”.</li>
       </ul>
       <button class="add-btn" onclick="finishOnboarding()">Começar missão</button>
     </div>
@@ -629,7 +645,12 @@
 
       <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
       <button class="voice-btn" onclick="startVoiceCommand()">🎙️ Comando de voz</button>
-      <p class="subtitle" id="voiceStatus" style="margin-top:8px;">Ex: “concluir estudar inglês” ou “próxima missão”.</p>
+      <p class="subtitle" id="voiceStatus" style="margin-top:8px;">Ex: “concluir estudar inglês”, “criar missão hoje às 18 reunião”, “criar rotina segunda quarta sexta às 7 academia”.</p>
+      <div class="voice-examples">
+        <small>🎙️ <strong>Finalizar:</strong> “concluir estudar inglês”</small>
+        <small>📅 <strong>Agendada:</strong> “criar missão sábado às 9 dentista”</small>
+        <small>🔁 <strong>Rotina:</strong> “criar rotina segunda quarta sexta às 7 academia”</small>
+      </div>
     </div>
 
     <div class="card">
@@ -1223,6 +1244,181 @@
       };
     }
 
+
+    function parseHourFromText(text) {
+      const normalized = normalizeText(text);
+
+      let match = normalized.match(/(?:as|às|a)\s*(\d{1,2})(?:[:h]\s*(\d{2}))?/);
+      if (!match) match = normalized.match(/(\d{1,2})(?:[:h]\s*(\d{2}))?\s*(?:horas|hora)/);
+      if (!match) return null;
+
+      let h = Number(match[1]);
+      let m = match[2] ? Number(match[2]) : 0;
+
+      if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    }
+
+    function addMinutesToTime(time, minutesToAdd) {
+      const [h, m] = time.split(":").map(Number);
+      const total = h * 60 + m + minutesToAdd;
+      const nh = Math.floor(total / 60) % 24;
+      const nm = total % 60;
+      return `${String(nh).padStart(2, "0")}:${String(nm).padStart(2, "0")}`;
+    }
+
+    function extractTitleFromVoice(text) {
+      let cleaned = normalizeText(text);
+
+      const removeWords = [
+        "fom", "criar", "adicionar", "missao", "missão", "agenda", "agendada",
+        "rotina", "hoje", "amanha", "amanhã", "segunda", "terca", "terça",
+        "quarta", "quinta", "sexta", "sabado", "sábado", "domingo",
+        "todo", "toda", "todos", "ano", "anual", "as", "às", "a", "marcar", "agendar"
+      ];
+
+      cleaned = cleaned.replace(/\d{1,2}([:h]\d{2})?/g, " ");
+
+      removeWords.forEach(word => {
+        cleaned = cleaned.replace(new RegExp(`\\b${normalizeText(word)}\\b`, "g"), " ");
+      });
+
+      cleaned = cleaned.replace(/\s+/g, " ").trim();
+
+      if (!cleaned) return "Nova missão";
+
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    }
+
+    function parseDaysFromText(text) {
+      const n = normalizeText(text);
+      const result = [];
+
+      const map = [
+        { keys: ["segunda", "seg"], value: 1 },
+        { keys: ["terca", "terça", "ter"], value: 2 },
+        { keys: ["quarta", "qua"], value: 3 },
+        { keys: ["quinta", "qui"], value: 4 },
+        { keys: ["sexta", "sex"], value: 5 },
+        { keys: ["sabado", "sábado", "sab"], value: 6 },
+        { keys: ["domingo", "dom"], value: 0 }
+      ];
+
+      if (n.includes("todo dia") || n.includes("todos os dias") || n.includes("diariamente")) {
+        return [1,2,3,4,5,6,0];
+      }
+
+      if (n.includes("dia de semana") || n.includes("segunda a sexta")) {
+        return [1,2,3,4,5];
+      }
+
+      map.forEach(item => {
+        if (item.keys.some(k => n.includes(normalizeText(k))) && !result.includes(item.value)) {
+          result.push(item.value);
+        }
+      });
+
+      return result;
+    }
+
+    function getDateFromWeekdayName(text) {
+      const targetDays = parseDaysFromText(text);
+      if (!targetDays.length) return null;
+
+      const today = new Date();
+      const current = today.getDay();
+      const target = targetDays[0];
+
+      let diff = target - current;
+      if (diff < 0) diff += 7;
+
+      const d = new Date();
+      d.setDate(d.getDate() + diff);
+      return d.toISOString().slice(0, 10);
+    }
+
+    function parseDateFromText(text) {
+      const n = normalizeText(text);
+      const today = new Date();
+
+      if (n.includes("hoje")) return todayKey();
+
+      if (n.includes("amanha") || n.includes("amanhã")) {
+        return todayKey(1);
+      }
+
+      const weekdayDate = getDateFromWeekdayName(text);
+      if (weekdayDate) return weekdayDate;
+
+      const numeric = n.match(/(\d{1,2})[\/\-](\d{1,2})(?:[\/\-](\d{2,4}))?/);
+      if (numeric) {
+        const day = Number(numeric[1]);
+        const month = Number(numeric[2]);
+        let year = numeric[3] ? Number(numeric[3]) : today.getFullYear();
+
+        if (year < 100) year += 2000;
+
+        const date = new Date(year, month - 1, day);
+        if (!isNaN(date.getTime())) {
+          return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+        }
+      }
+
+      return todayKey();
+    }
+
+    function createScheduledByVoice(text) {
+      const start = parseHourFromText(text) || "08:00";
+      const end = addMinutesToTime(start, 30);
+      const title = extractTitleFromVoice(text);
+      const date = parseDateFromText(text);
+      const yearly = normalizeText(text).includes("todo ano") || normalizeText(text).includes("anual") || normalizeText(text).includes("aniversario");
+
+      tasks.push({
+        id: Date.now(),
+        type: "scheduled",
+        days: [],
+        date,
+        yearly,
+        start,
+        end,
+        title,
+        doneDates: []
+      });
+
+      save();
+      render();
+      showToast(`Missão agendada criada: ${title}`);
+      playMissionSound();
+      vibrate([70, 30, 90]);
+    }
+
+    function createRoutineByVoice(text) {
+      const start = parseHourFromText(text) || "08:00";
+      const end = addMinutesToTime(start, 30);
+      const title = extractTitleFromVoice(text);
+      let days = parseDaysFromText(text);
+
+      if (!days.length) days = [1,2,3,4,5];
+
+      tasks.push({
+        id: Date.now(),
+        type: "routine",
+        days,
+        start,
+        end,
+        title,
+        doneDates: []
+      });
+
+      save();
+      render();
+      showToast(`Rotina criada: ${title}`);
+      playMissionSound();
+      vibrate([70, 30, 90]);
+    }
+
     function processVoiceCommand(spoken) {
       const text = normalizeText(spoken);
       const today = todayKey();
@@ -1233,8 +1429,23 @@
         return;
       }
 
-      if (text.includes("nova")) {
+      if (text.includes("nova") && !text.includes("criar") && !text.includes("adicionar")) {
         openNewTaskForm();
+        return;
+      }
+
+      if (text.includes("criar rotina") || text.includes("adicionar rotina") || text.includes("rotina")) {
+        createRoutineByVoice(spoken);
+        return;
+      }
+
+      if (
+        text.includes("criar") ||
+        text.includes("adicionar") ||
+        text.includes("agendar") ||
+        text.includes("marcar")
+      ) {
+        createScheduledByVoice(spoken);
         return;
       }
 
