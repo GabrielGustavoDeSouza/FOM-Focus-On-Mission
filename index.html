@@ -4,6 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>FOM - Focus On Mission</title>
+  <meta name="theme-color" content="#1d2bff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="FOM" />
+  <link id="dynamicIcon" rel="icon" type="image/svg+xml" href="" />
+  <link id="dynamicAppleIcon" rel="apple-touch-icon" href="" />
+  <link id="dynamicManifest" rel="manifest" href="" />
 
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -578,6 +585,50 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <script>
+    const OFFENSIVE_GOAL_PERCENT = 90;
+
+    function setupAppIcon() {
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+          <defs>
+            <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#00e5ff"/>
+              <stop offset="55%" stop-color="#1d2bff"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+            <linearGradient id="bolt" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#fff176"/>
+              <stop offset="100%" stop-color="#ff4ecd"/>
+            </linearGradient>
+          </defs>
+          <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+          <path d="M300 32 118 282h118l-42 198 206-286H278L300 32Z" fill="url(#bolt)" stroke="white" stroke-width="14" stroke-linejoin="round"/>
+          <text x="256" y="438" text-anchor="middle" font-family="Arial, sans-serif" font-size="82" font-weight="900" fill="white">FOM</text>
+        </svg>
+      `.trim();
+
+      const iconUrl = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      document.getElementById("dynamicIcon").setAttribute("href", iconUrl);
+      document.getElementById("dynamicAppleIcon").setAttribute("href", iconUrl);
+
+      const manifest = {
+        name: "FOM - Focus On Mission",
+        short_name: "FOM",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#09091f",
+        theme_color: "#1d2bff",
+        icons: [
+          { src: iconUrl, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+        ]
+      };
+
+      const manifestUrl = "data:application/manifest+json;charset=utf-8," + encodeURIComponent(JSON.stringify(manifest));
+      document.getElementById("dynamicManifest").setAttribute("href", manifestUrl);
+    }
+
+    setupAppIcon();
+
     const days = [
       { id: 1, name: "SEG", full: "Segunda-feira" },
       { id: 2, name: "TER", full: "Terça-feira" },
@@ -692,13 +743,20 @@
       const missing = progress.total - progress.done;
 
       if (progress.percent === 100 && progress.total > 0) {
-        notice.innerText = "Missão completa! Hoje você fechou 100%. Ofensiva protegida.";
+        notice.innerText = "Dia perfeito: 100% concluído. Ofensiva protegida.";
+      } else if (progress.percent >= OFFENSIVE_GOAL_PERCENT && progress.total > 0) {
+        notice.innerText = `Ofensiva protegida: você já passou de ${OFFENSIVE_GOAL_PERCENT}% hoje.`;
       } else if (progress.total === 0) {
         notice.innerText = "Hoje ainda não tem missão cadastrada. Crie uma missão para começar sua ofensiva.";
-      } else if (missing === 1) {
-        notice.innerText = "Falta 1 missão para fechar 100% hoje.";
       } else {
-        notice.innerText = `Faltam ${missing} missões para fechar 100% hoje.`;
+        const targetDone = Math.ceil(progress.total * (OFFENSIVE_GOAL_PERCENT / 100));
+        const missingToGoal = Math.max(0, targetDone - progress.done);
+
+        if (missingToGoal === 1) {
+          notice.innerText = `Falta 1 missão para proteger sua ofensiva de ${OFFENSIVE_GOAL_PERCENT}%.`;
+        } else {
+          notice.innerText = `Faltam ${missingToGoal} missões para proteger sua ofensiva de ${OFFENSIVE_GOAL_PERCENT}%.`;
+        }
       }
     }
 
@@ -1013,6 +1071,10 @@
         vibrate([60, 30, 80]);
         pulseTask(id);
 
+        if (before.percent < OFFENSIVE_GOAL_PERCENT && after.percent >= OFFENSIVE_GOAL_PERCENT && after.total > 0) {
+          celebrateGoal(today);
+        }
+
         if (before.percent < 100 && after.percent === 100 && after.total > 0) {
           celebrateDay(today);
         }
@@ -1034,14 +1096,24 @@
 
     function calculateStreak() {
       let streak = 0;
+      const todayProgress = getProgressByDate(todayKey());
 
-      for (let i = 0; i < 365; i++) {
-        const date = todayKey(-i);
+      // Regra da ofensiva:
+      // O dia conta para a ofensiva quando atinge 90% ou mais.
+      // Se hoje ainda não bateu 90%, mantém a sequência conquistada até ontem.
+      const startOffset = todayProgress.percent >= OFFENSIVE_GOAL_PERCENT && todayProgress.total > 0 ? 0 : -1;
+
+      for (let i = startOffset; i > -365; i--) {
+        const date = todayKey(i);
         const p = getProgressByDate(date);
 
         if (!p.total) break;
-        if (p.percent === 100) streak++;
-        else break;
+
+        if (p.percent >= OFFENSIVE_GOAL_PERCENT) {
+          streak++;
+        } else {
+          break;
+        }
       }
 
       return streak;
@@ -1062,7 +1134,7 @@
       for (let i = 0; i < 7; i++) {
         const date = todayKey(-i);
         const p = getProgressByDate(date);
-        if (!p.total || p.percent < 100) return;
+        if (!p.total || p.percent < OFFENSIVE_GOAL_PERCENT) return;
       }
 
       lastCelebratedWeek = weekKey;
@@ -1070,7 +1142,18 @@
 
       playWeekSound();
       fireConfetti(260);
-      showAchievement("🏆", "Semana perfeita!", "Persistência vence intensidade. Você construiu essa semana missão por missão.");
+      showAchievement("🏆", "Semana de ofensiva!", `Persistência vence intensidade. Você manteve ${OFFENSIVE_GOAL_PERCENT}% ou mais em todos os últimos 7 dias.`);
+    }
+
+    function celebrateGoal(dateKey) {
+      const key = "goal-" + dateKey;
+      if (localStorage.getItem("fom_last_goal_celebrated") === key) return;
+
+      localStorage.setItem("fom_last_goal_celebrated", key);
+
+      playMissionSound();
+      vibrate([80, 40, 120]);
+      showToast(`Ofensiva protegida: ${OFFENSIVE_GOAL_PERCENT}% atingido!`);
     }
 
     function celebrateDay(dateKey) {
